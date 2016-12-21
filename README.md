@@ -5,17 +5,15 @@ known as Stochastic Context Free Grammar (SCFG)),
 or equivalently any language described in Backus-Naur Form (BNF). In these grammars, 
 rewrite rules may be non-deterministic and have a probability attached to them.
 
-Written in TypeScript, compiled to ES5 UMD modules.
+
 
 For a theoretical grounding of this work, refer to [*Stolcke, An Efficient Probabilistic Context-Free
            Parsing Algorithm that Computes Prefix
            Probabilities*](http://www.aclweb.org/anthology/J95-2002).
   
 ## Motivation
-I made this library because I could not find an existing JavaScript
-implementation of the Probabilistic Earley Parser. 
-
-I have made a stochastic CYK parser before, but I wanted something
+While libraries for nondeterministic grammars abound, I could not find an existing JavaScript
+implementation of the Probabilistic Earley Parser. I have made a stochastic CYK parser before, but I wanted something
 more top down that makes it easier to intervene in the parsing process,
 for instance when an unexpected token is encountered. 
 In many cases, Earley also parses faster than CYK.
@@ -24,6 +22,8 @@ In many cases, Earley also parses faster than CYK.
 todo
 
 ## Some notes on implementation
+Written in TypeScript, compiled to ES5 UMD modules.
+
 The probability of a parse is defined as the product of the probalities all the applied rules. Usually,
 we define probability as a number between 0 and 1 inclusive, and use common algebraic notions of addition and
 multiplication.
