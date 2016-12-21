@@ -1,13 +1,13 @@
-import {State, getActiveCategory, advanceDot, isPassive, isCompleted} from "./state";
-import {StateSets} from "../state-sets";
-import {Grammar} from "../../grammar/grammar";
-import {NonTerminal, Category} from "../../grammar/category";
-import {Rule, isUnitProduction} from "../../grammar/rule";
+import {State, getActiveCategory, advanceDot, isPassive, isCompleted} from "./state/state";
+import {StateSets} from "./state-sets";
+import {Grammar} from "../grammar/grammar";
+import {NonTerminal, Category} from "../grammar/category";
+import {Rule, isUnitProduction} from "../grammar/rule";
 import {makeDeferrable} from "semiring";
 import {Expression} from "semiring/abstract-expression/expression";
-import {DeferredStateScoreComputations} from "./addable-expressions-container";
+import {DeferredStateScoreComputations} from "./state/addable-expressions-container";
 import {Atom} from "semiring/abstract-expression/atom";
-import {StateIndex} from "../state-index";
+import {StateIndex} from "./state-index";
 /**
  * Completes states exhaustively and makes resolvable expressions for the forward and inner scores.
  * Note that these expressions can only be resolved to actual values after finishing completion, because they may depend on one another.
