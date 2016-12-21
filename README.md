@@ -46,7 +46,7 @@ parse:
 * unambiguous CFGs in O(n²)
 * left-recursive unambiguous grammars in O(n)
 
-Note that this implementation does not apply innovations such as [Joop Leo's improvement](http://www.sciencedirect.com/science/article/pii/030439759190180A) to run linearly on on right-recursive grammars as well. It might be complicated to implement this, and still have a probabilistic parser.
+Note that this implementation does not apply innovations such as [Joop Leo's improvement](http://www.sciencedirect.com/science/article/pii/030439759190180A) to run linearly on on right-recursive grammars as well. It might be complicated to implement this: making the parser stochastic is not as easy for Earley as it is for CYK.
 
 For a faster parser that work on non-probabilistic grammars, look into [nearley](nearley.js.org).
 
