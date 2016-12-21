@@ -16,7 +16,8 @@ While libraries for nondeterministic grammars abound, I could not find an existi
 implementation of the Probabilistic Earley Parser. I have made a stochastic CYK parser before, but I wanted something
 more top down that makes it easier to intervene in the parsing process,
 for instance when an unexpected token is encountered. 
-In many cases, Earley also parses faster than CYK.
+In many cases Earley also parses faster than CYK (sparse grammars) and it doesn't require the grammar to be 
+rewritten in any normal form.
    
 ## Usage
 todo
