@@ -39,19 +39,19 @@ describe('State', () => {
                 rule: r,
                 ruleStartPosition: 0,
                 ruleDotPosition: r.right.length,
-                positionInInput: 0
+                position: 0
             })).to.equal(true);
             expect(isCompleted({
                 rule: r,
                 ruleStartPosition: 0,
                 ruleDotPosition: 0,
-                positionInInput: 0
+                position: 0
             })).to.equal(false);
             expect(isCompleted({
                 rule: r,
                 ruleStartPosition: 0,
                 ruleDotPosition: r.right.length - 1,
-                positionInInput: 0
+                position: 0
             })).to.equal(false);
         });
     });

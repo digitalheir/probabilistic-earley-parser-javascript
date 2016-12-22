@@ -3,6 +3,14 @@ import {Semiring} from "semiring/semiring";
 import {StateSets} from "./state-sets";
 import {getActiveCategory, State, advanceDot} from "./state/state";
 
+
+/**
+ * Handles a token scanned from the input string.
+ *
+ * @param tokenPosition   The start index of the scan.
+ * @param token           The token that was scanned.
+ * //@param scanProbability Function that provides the probability of scanning the given token at this position. Might be null for a probability of 1.0.
+ */
 export function scan<S, T>(tokenPosition: number,
                            token: T,
                            //scanProbability:(x:T)=>number,//TODO

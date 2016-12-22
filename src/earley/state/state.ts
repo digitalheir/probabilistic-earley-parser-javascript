@@ -34,7 +34,7 @@ export interface State<SemiringType, TokenType> {
     rule: Rule<TokenType>;
     ruleStartPosition: number;
     ruleDotPosition: number;
-    positionInInput: number;
+    position: number;
     scannedToken?: TokenType;
     scannedCategory?: Category<TokenType>;
 }
@@ -72,7 +72,7 @@ export function getActiveCategory<Semi,Token>(state: State<Semi, Token>): Catego
  */
 export function isPassive<T>(rule: Rule<T>, dotPosition: number) {
     if (dotPosition < 0 || dotPosition > rule.right.length)
-        invalidDotPosition(dotPosition, ...this.right);
+        invalidDotPosition(dotPosition, rule);
     return dotPosition === rule.right.length;
 }
 

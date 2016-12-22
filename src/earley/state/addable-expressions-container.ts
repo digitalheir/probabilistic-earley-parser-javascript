@@ -11,7 +11,7 @@ import {Atom} from "semiring/abstract-expression/atom";
 export class DeferredStateScoreComputations<SemiringType,TokenType> {
     readonly semiring: Semiring<Expression<SemiringType>>;
 
-    private states: Map<Rule<TokenType>,
+    states: Map<Rule<TokenType>,
         /*index*/
         Map<number,
             /*rule start*/
@@ -59,7 +59,7 @@ export class DeferredStateScoreComputations<SemiringType,TokenType> {
     }
 
     getExpressionByState(state: State<SemiringType, TokenType>): Expression<SemiringType> {
-        return this.getExpression(state.rule, state.positionInInput, state.ruleStartPosition, state.ruleDotPosition);
+        return this.getExpression(state.rule, state.position, state.ruleStartPosition, state.ruleDotPosition);
     }
 
     setScore(rule: Rule<TokenType>,
@@ -96,7 +96,7 @@ export class DeferredStateScoreComputations<SemiringType,TokenType> {
     setScoreForState(state: State<SemiringType, TokenType>, expression: Expression<SemiringType>): void {
         this.setScore(
             state.rule,
-            state.positionInInput,
+            state.position,
             state.ruleStartPosition,
             state.ruleDotPosition,
             expression);

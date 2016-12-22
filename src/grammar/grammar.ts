@@ -28,6 +28,7 @@ export interface ProbabilitySemiringMapping<Y> {
     fromProbability(p: number): Y;
     toProbability(p: Y): number;
     ZERO: Y;
+    ONE: Y;
 }
 
 export class Grammar<T, SemiringType> {
@@ -110,9 +111,10 @@ export class Grammar<T, SemiringType> {
 
 const LOG_SEMIRING: ProbabilitySemiringMapping<number> = {
     semiring: LogSemiring,
-    fromProbability: fromProbability,
-    toProbability: toProbability,
-    ZERO: LogSemiring.additiveIdentity
+    fromProbability: (x) => -Math.log(x),
+    toProbability: (x) => Math.exp(-x),
+    ZERO: LogSemiring.additiveIdentity,
+    ONE: LogSemiring.multiplicativeIdentity
 };
 
 export class GrammarBuilder<T, SemiringType> {

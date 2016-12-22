@@ -6,7 +6,7 @@ import {State, isCompleted, isActive, getActiveCategory} from "./state/state";
 import {NonTerminal, Terminal, isNonTerminal} from "../grammar/category";
 import {Semiring} from "semiring/semiring";
 import {getOrCreateSet, getOrCreateMap} from "../util";
-import {isUnitProduction, Rule} from "../grammar/rule";
+import {isUnitProduction, Rule, invalidDotPosition} from "../grammar/rule";
 import {ViterbiScore} from "./state/viterbi-score";
 
 export class StateSets<T, S> {
@@ -94,6 +94,13 @@ export class StateSets<T, S> {
         return getOrCreateSet(getOrCreateMap(this.nonTerminalActiveAtIWithNonZeroUnitStarToY, index), Y);
     }
 
+    getStatesActiveOnNonTerminal(y: NonTerminal, position: number, beforeOrOnPosition: number): Set<State<S,T>> {
+        if (position <= beforeOrOnPosition)
+            return getOrCreateSet(getOrCreateMap(this.statesActiveOnNonTerminal, y), position);
+        else
+            throw new Error("Querying position after what we're on?");
+    }
+
 //
 //
 // public Set<State> getStatesActiveOnNonTerminal(NonTerminal y, int position, int beforeOrOnPosition) {
@@ -153,7 +160,10 @@ export class StateSets<T, S> {
                 ? <Terminal<T>> rule.right[ruleDotPosition - 1]
                 : undefined;
             const state: State<S, T> = {
-                rule, positionInInput, ruleStartPosition, ruleDotPosition,
+                rule,
+                position:positionInInput,
+                ruleStartPosition,
+                ruleDotPosition,
                 scannedToken: scannedToken,
                 scannedCategory
             };
@@ -163,7 +173,7 @@ export class StateSets<T, S> {
     }
 
     hasState(state: State<S, T>): boolean {
-        return this.states.has(state.rule, state.positionInInput, state.ruleStartPosition, state.ruleDotPosition);
+        return this.states.has(state.rule, state.position, state.ruleStartPosition, state.ruleDotPosition);
     }
 
     has(rule: Rule<T>, index: number, ruleStart: number, ruleDot: number): boolean {
@@ -171,9 +181,12 @@ export class StateSets<T, S> {
     }
 
     addState(state: State<S, T>): void {
+        if (state.ruleDotPosition < 0 || state.ruleDotPosition > state.rule.right.length)
+            invalidDotPosition(state.ruleDotPosition, state);
+
         this.states.addState(state);
 
-        const position = state.positionInInput;
+        const position = state.position;
 
         getOrCreateSet(this.byIndex, position).add(state);
 
@@ -183,17 +196,17 @@ export class StateSets<T, S> {
                 getOrCreateSet(this.completedStatesThatAreNotUnitProductions, position).add(state);
 
             getOrCreateSet(getOrCreateMap(this.completedStatesFor,
-                state.positionInInput), state.rule.left)
+                state.position), state.rule.left)
                 .add(state);
         }
         if (isActive(state)) {
             const activeCategory = getActiveCategory(state);
             if (isNonTerminal(activeCategory)) {
                 getOrCreateSet(getOrCreateMap(this.statesActiveOnNonTerminal,
-                    activeCategory), state.positionInInput)
+                    activeCategory), state.position)
                     .add(state);
                 getOrCreateSet(this.statesActiveOnNonTerminals,
-                    state.positionInInput)
+                    state.position)
                     .add(state);
 
                 this.grammar.unitStarScores

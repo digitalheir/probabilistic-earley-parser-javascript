@@ -22,18 +22,18 @@ describe('StateSets', () => {
             expect(state).to.exist;
             expect(ss.states.has(r, 2, 1, 1)).to.equal(true);
 
-            expect(getOrCreateSet(ss.completedStates, (state.positionInInput)).has(state)).to.equal(isCompleted(state));
-            expect(getOrCreateSet(getOrCreateMap(ss.completedStatesFor, (state.positionInInput)), r.left).has(state)).to.equal(isCompleted(state));
-            expect(getOrCreateSet(ss.completedStatesThatAreNotUnitProductions, (state.positionInInput)).has(state)).to.equal(isCompleted(state) && !isUnitProduction(state.rule));
+            expect(getOrCreateSet(ss.completedStates, (state.position)).has(state)).to.equal(isCompleted(state));
+            expect(getOrCreateSet(getOrCreateMap(ss.completedStatesFor, (state.position)), r.left).has(state)).to.equal(isCompleted(state));
+            expect(getOrCreateSet(ss.completedStatesThatAreNotUnitProductions, (state.position)).has(state)).to.equal(isCompleted(state) && !isUnitProduction(state.rule));
 
             const activeCategory: Category<string> = getActiveCategory(state);
-            expect(getOrCreateSet(ss.statesActiveOnNonTerminals, (state.positionInInput)).has(state)).to.equal(isActive(state) && isNonTerminal(activeCategory));
+            expect(getOrCreateSet(ss.statesActiveOnNonTerminals, (state.position)).has(state)).to.equal(isActive(state) && isNonTerminal(activeCategory));
 
             const nonZeroScoresToNonTerminals = g.unitStarScores.getNonZeroScoresToNonTerminals(activeCategory);
-            if (!!nonZeroScoresToNonTerminals) nonZeroScoresToNonTerminals.forEach((FromNonTerminal: NonTerminal) => expect(getOrCreateSet(getOrCreateMap(ss.nonTerminalActiveAtIWithNonZeroUnitStarToY, (state.positionInInput)), FromNonTerminal).has(state)).to.equal(true));
+            if (!!nonZeroScoresToNonTerminals) nonZeroScoresToNonTerminals.forEach((FromNonTerminal: NonTerminal) => expect(getOrCreateSet(getOrCreateMap(ss.nonTerminalActiveAtIWithNonZeroUnitStarToY, (state.position)), FromNonTerminal).has(state)).to.equal(true));
 
-            expect(getOrCreateSet(getOrCreateMap(ss.statesActiveOnNonTerminal, activeCategory), state.positionInInput).has(state)).to.equal(isActive(state) && isNonTerminal(activeCategory));
-            expect(getOrCreateSet(ss.statesActiveOnTerminals, state.positionInInput).has(state)).to.equal(isActive(state) && !isNonTerminal(activeCategory));
+            expect(getOrCreateSet(getOrCreateMap(ss.statesActiveOnNonTerminal, activeCategory), state.position).has(state)).to.equal(isActive(state) && isNonTerminal(activeCategory));
+            expect(getOrCreateSet(ss.statesActiveOnTerminals, state.position).has(state)).to.equal(isActive(state) && !isNonTerminal(activeCategory));
         });
 
         //readonly byIndex: Map<number, Set<State<S, T>>>;

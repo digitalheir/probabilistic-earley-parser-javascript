@@ -35,9 +35,11 @@ export class StateIndex<SemiringType,TokenType> {
 
     public addState(state: State<SemiringType,TokenType>) {
         const m = getOrCreateMap(getOrCreateMap(getOrCreateMap(this.states,
-            state.rule), state.positionInInput), state.ruleStartPosition);
-        if (m.has(state.ruleDotPosition)) throw new Error("State set already contained state. This is a bug.");
-        m.set(state.ruleDotPosition, state);
+            state.rule), state.position), state.ruleStartPosition);
+        if (m.has(state.ruleDotPosition)){
+            // throw new Error("State set already contained state. This is a bug.");
+        }
+        else m.set(state.ruleDotPosition, state);
     }
 
     public getState(rule: Rule<TokenType>, index: number, ruleStart: number, ruleDot: number): State<SemiringType,TokenType> {

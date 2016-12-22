@@ -19,12 +19,12 @@ import {StateIndex} from "./state-index";
  * @param grammar
  * @param stateSets
  */
-export function completeNoViterbi<S,T>(position: number,
-                                       states: Set<State<S,T>>,
-                                       addForwardScores: DeferredStateScoreComputations<S,T>,
-                                       addInnerScores: DeferredStateScoreComputations<S,T>,
-                                       grammar: Grammar<T, S>,
-                                       stateSets: StateSets<T, S>) {
+function completeNoViterbi<S,T>(position: number,
+                                states: Set<State<S,T>>,
+                                addForwardScores: DeferredStateScoreComputations<S,T>,
+                                addInnerScores: DeferredStateScoreComputations<S,T>,
+                                grammar: Grammar<T, S>,
+                                stateSets: StateSets<T, S>) {
     let possiblyNewStates: DeferredStateScoreComputations<S,T>;
 
     // For all states
@@ -47,7 +47,7 @@ export function completeNoViterbi<S,T>(position: number,
 
         //noinspection Convert2streamapi
         stateSets.getStatesActiveOnNonTerminalWithNonZeroUnitStarScoreToY(j, Y).forEach((stateToAdvance: State<S,T>) => {
-            if (j !== stateToAdvance.positionInInput) throw new Error("Index failed. This is a bug.");
+            if (j !== stateToAdvance.position) throw new Error("Index failed. This is a bug.");
             // Make i: X_k → lZ·m
             const innerScore2 = stateSets.getInnerScore(stateToAdvance);
             // TODO pre-create atom?
@@ -135,7 +135,7 @@ export function completeNoViterbi<S,T>(position: number,
                 newCompletedStates.add(state);
             });
         if (newCompletedStates != null && newCompletedStates.size > 0) {
-            this.completeNoViterbi(position,
+            completeNoViterbi(position,
                 newCompletedStates,
                 addForwardScores,
                 addInnerScores,
@@ -143,4 +143,40 @@ export function completeNoViterbi<S,T>(position: number,
             );
         }
     }
+}
+
+/**
+ * Makes completions in the specified chart at the given index.
+ *
+ * @param i The index to make completions at.
+ * @param stateSets
+ * @param grammar
+ */
+export function complete<S,T>(i: number,
+                              stateSets: StateSets<T,S>,
+                              grammar: Grammar<T, S>) {
+    const addForwardScores = new DeferredStateScoreComputations(grammar.deferrableSemiring);
+    const addInnerScores = new DeferredStateScoreComputations(grammar.deferrableSemiring);
+
+    const completeOnStates = stateSets.completedStatesThatAreNotUnitProductions.get(i);
+    if (!!completeOnStates) completeNoViterbi(
+        i,
+        completeOnStates,
+        addForwardScores,
+        addInnerScores,
+        grammar,
+        stateSets
+    );
+
+    // Resolve and set forward score
+    addForwardScores.forEach((position, ruleStart, dot, rule, score) => {
+        const state: State<S,T> = stateSets.getOrCreate(position, ruleStart, dot, rule);
+        stateSets.setForwardScore(state, score.resolve());
+    });
+
+    // Resolve and set inner score
+    addInnerScores.forEach((position, ruleStart, dot, rule, score) => {
+        const state: State<S,T> = stateSets.getOrCreate(position, ruleStart, dot, rule);
+        stateSets.setInnerScore(state, score.resolve());
+    });
 }

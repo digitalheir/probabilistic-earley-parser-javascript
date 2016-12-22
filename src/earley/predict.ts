@@ -4,6 +4,17 @@ import {State, StateWithScore, getActiveCategory} from "./state/state";
 import {Category, isNonTerminal, NonTerminal} from "../grammar/category";
 import {Rule} from "../grammar/rule";
 
+
+/**
+ * Makes predictions in the specified chart at the given index.
+
+ * For each state at position i, look at the the nonterminal at the dot position,
+ * add a state that expands that nonterminal at position i, with the dot position at 0
+ *
+ * @param index The string index to make predictions at.
+ * @param grammar
+ * @param stateSets
+ */
 export function predict<S, T>(index: number,
                               grammar: Grammar<T, S>,
                               stateSets: StateSets<T, S>) {
@@ -58,7 +69,7 @@ export function predict<S, T>(index: number,
                                 });
                             } else {
                                 const predicted2: State<S,T> = {
-                                    positionInInput: index,
+                                    position: index,
                                     ruleStartPosition: index,
                                     ruleDotPosition: 0,
                                     rule: Y_to_v
