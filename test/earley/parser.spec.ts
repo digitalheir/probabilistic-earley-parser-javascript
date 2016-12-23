@@ -1,5 +1,5 @@
 import {NonTerminal, Terminal, Category} from "../../src/grammar/category";
-import {Grammar} from "../../src/grammar/grammar";
+import {getViterbiParse, ParseTreeWithScore, Grammar} from "../../src/index";
 
 import * as Mocha from 'mocha'
 import {expect} from 'chai';
@@ -9,7 +9,6 @@ import {ss} from "./state-set.spec";
 import {Chart} from "../../src/earley/state/chart";
 import {g, A} from "../sample-grammar";
 import {parseSentenceIntoChart} from "../../src/earley/parser";
-import {getViterbiParse, ParseTreeWithScore} from "../../index";
 
 //TODO
 describe('parser', () => {
