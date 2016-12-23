@@ -131,3 +131,29 @@ export function parseSentenceIntoChart<S,T>(Start: NonTerminal,
     return [stateSets, i, init];
 }
 
+export interface ParseTreeWithScore<T> {
+    parseTree: ParseTree<T>;
+    probability: number;
+}
+
+export function getViterbiParse<S,T>(Start: NonTerminal,
+                                     grammar: Grammar<T,S>,
+                                     tokens: T[]): ParseTreeWithScore<T>{
+    const [chart, i, init] = parseSentenceIntoChart(Start, grammar, tokens);
+
+    const finalState = chart.getOrCreate(
+        tokens.length,
+        0,
+        init.rule.right.length,
+        init.rule
+    );
+
+    const parseTree:ParseTree<T> = getViterbiParseFromChart(finalState, chart);
+    const toProbability = grammar.probabilityMapping.toProbability;
+    const finalScore = chart.viterbiScores.get(finalState).innerScore;
+
+    return {
+        parseTree,
+        probability: toProbability(finalScore)
+    }
+}

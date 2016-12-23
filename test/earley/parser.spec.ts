@@ -9,7 +9,7 @@ import {ss} from "./state-set.spec";
 import {Chart} from "../../src/earley/state/chart";
 import {g, A} from "../sample-grammar";
 import {parseSentenceIntoChart} from "../../src/earley/parser";
-import {getViterbiParse, ParseTreeWithScore} from "../../src/index";
+import {getViterbiParse, ParseTreeWithScore} from "../../index";
 
 //TODO
 describe('parser', () => {

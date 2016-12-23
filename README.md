@@ -21,6 +21,8 @@ rewritten in any normal form.
    
 ## Usage
 ````javascript
+        import {getViterbiParse, Grammar} from 'probabilistic-earley-parser-js';
+
         // Nonterminals are string
         const S = "S"; // : NonTerminal 
         const NP = "NP"; // : NonTerminal 
