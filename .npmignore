@@ -4,3 +4,4 @@
 /test
 /.yarn.lock
 /*.tgz
+/.travis.yml
