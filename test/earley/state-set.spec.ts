@@ -3,12 +3,12 @@ import {Rule, isUnitProduction} from "../../src/grammar/rule";
 
 import * as Mocha from 'mocha'
 import {expect} from 'chai';
-import {StateSets} from "../../src/earley/state-sets";
+import {Chart} from "../../src/earley/state/chart";
 import {g} from "../sample-grammar";
 import {isCompleted, State, isActive, getActiveCategory} from "../../src/earley/state/state";
 import {getOrCreateSet, getOrCreateMap} from "../../src/util";
 
-export const ss = new StateSets<string, number>(g);
+export const ss = new Chart<string, number>(g);
 
 describe('StateSets', () => {
     it('should behave correctly', () => {

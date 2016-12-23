@@ -1,21 +1,21 @@
-import {Grammar, ProbabilitySemiringMapping} from "../grammar/grammar";
-import {NonTerminal, Category} from "../grammar/category";
+import {Grammar} from "../grammar/grammar";
+import {NonTerminal, Category, isNonTerminal} from "../grammar/category";
 import {Rule} from "../grammar/rule";
-import {State, advanceDot, isCompleted} from "./state/state";
-import {StateSets} from "./state-sets";
-import {ViterbiScore} from "./state/viterbi-score";
+import {State} from "./state/state";
+import {setViterbiScores, ViterbiScore} from "./state/viterbi-score";
+import {Chart} from "./state/chart";
 import {scan} from "./scan";
 import {predict} from "./predict";
 import {complete} from "./complete";
-// import {Semiring} from "semiring/semiring";
+import {ParseTree, addRightMost} from "./parsetree";
 
-function addState<S,T>(stateSets: StateSets<T, S>,
+function addState<S,T>(stateSets: Chart<T, S>,
                        index: number,
                        ruleStartPosition: number,
                        ruleDotPosition: number,
                        rule: Rule<T>,
                        forward: S,
-                       inner: S):State<S,T> {
+                       inner: S): State<S,T> {
     const state = stateSets.getOrCreate(index, ruleStartPosition, ruleDotPosition, rule);
     stateSets.setInnerScore(state, inner);
     stateSets.setForwardScore(state, forward);
@@ -33,17 +33,65 @@ function addState<S,T>(stateSets: StateSets<T, S>,
     return state;
 }
 
-export interface ChartWithInputPosition<S,T> {
-    stateSets: StateSets<T,S>,
-    i:number
+/**
+ * Performs the backward part of the forward-backward algorithm
+ */
+export function getViterbiParseFromChart<S,T>(state: State<S,T>, chart: Chart<T, S>): ParseTree<T> {
+    switch (state.ruleDotPosition) {
+        case 0:
+            // Prediction state
+            return {category: state.rule.left, children: []};
+        default:
+            const prefixEnd: Category<T> = state.rule.right[state.ruleDotPosition - 1];
+            if (!isNonTerminal(prefixEnd)) {
+                // Scanned terminal state
+                if (!state.scannedToken)
+                    throw new Error("Expected state to be a scanned state. This is a bug.");
+
+                // let \'a = \, call
+                const T: ParseTree<T> = getViterbiParseFromChart(
+                    chart.getOrCreate(
+                        state.position - 1,
+                        state.ruleStartPosition,
+                        state.ruleDotPosition - 1,
+                        state.rule
+                    ),
+                    chart
+                );
+                addRightMost(T, {token: state.scannedToken, category: state.scannedCategory, children: []});
+                return T;
+            } else {
+                // Completed non-terminal state
+                const viterbi: ViterbiScore<S,T> = chart.viterbiScores.get(state); // must exist
+
+                // Completed state that led to the current state
+                const origin: State<S,T> = viterbi.origin;
+
+                // Recurse for predecessor state (before the completion happened)
+                const T: ParseTree<T> = getViterbiParseFromChart(
+                    chart.getOrCreate(
+                        origin.ruleStartPosition,
+                        state.ruleStartPosition,
+                        state.ruleDotPosition - 1,
+                        state.rule
+                    )
+                    , chart);
+
+                // Recurse for completed state
+                const Tprime: ParseTree<T> = getViterbiParseFromChart(origin, chart);
+
+                addRightMost(T, Tprime);
+                return T;
+            }
+    }
 }
 
-export function parseAndCountTokens<S,T>(Start: NonTerminal,
-                                         grammar: Grammar<T,S>,
-                                         tokens: T[]): [StateSets<T,S>, number, State<S,T>] {
+export function parseSentenceIntoChart<S,T>(Start: NonTerminal,
+                                            grammar: Grammar<T,S>,
+                                            tokens: T[]): [Chart<T,S>, number, State<S,T>] {
     //ScanProbability scanProbability//TODO
 
-    const stateSets: StateSets<T,S> = new StateSets(grammar);
+    const stateSets: Chart<T,S> = new Chart(grammar);
     // Initial state
     //const initialState:State<S,T> = undefined;//todo
     // new State(
@@ -81,92 +129,5 @@ export function parseAndCountTokens<S,T>(Start: NonTerminal,
     //Set<State> completed = chart.getCompletedStates(i, Category.START);
     //if (completed.size() > 1) throw new Error("This is a bug");
     return [stateSets, i, init];
-}
-
-
-/**
- * For finding the Viterbi path, we can't conflate production recursions (ie can't use the left star corner),
- * exactly because we need it to find the unique Viterbi path.
- * Luckily, we can avoid looping over unit productions because it only ever lowers probability
- * (assuming p = [0,1] and Occam's razor). ~This method does not guarantee a left most parse.~
- *
- * @param stateSets
- * @param completedState Completed state to calculate Viterbi score for
- * @param originPathTo
- * @param m
- *///TODO write tests
-function setViterbiScores<S,T>(stateSets: StateSets<T, S>,
-                               completedState: State<S,T>,
-                               originPathTo: Set<State<S,T>>,
-                               m: ProbabilitySemiringMapping<S>): void {
-    const sr = m.semiring;
-    let newStates: State<S,T>[] = null; // init as null to avoid array creation
-    let newCompletedStates: State<S,T>[] = null; // init as null to avoid array creation
-
-    if (!stateSets.viterbiScores.has(completedState))
-        throw new Error("Expected Viterbi score to be set on completed state. This is a bug.");
-
-    const completedViterbi: S = stateSets.viterbiScores
-        .get(completedState)
-        .innerScore;
-
-
-
-    const Y: NonTerminal = completedState.rule.left;
-    //Get all states in j <= i, such that <code>j: X<sub>k</sub> →  λ·Yμ</code>
-    const pos: number = completedState.position;
-    stateSets.getStatesActiveOnNonTerminal(
-        Y, completedState.ruleStartPosition, pos
-    ).forEach((stateToAdvance) => {
-        if (stateToAdvance.position > pos || stateToAdvance.position != completedState.ruleStartPosition)
-            throw new Error("Index failed. This is a bug.");
-
-        const ruleStart: number = stateToAdvance.ruleStartPosition;
-        const nextDot: number = advanceDot(stateToAdvance);
-        const rule: Rule<T> = stateToAdvance.rule;
-
-        let resultingState = stateSets.states.getState(rule, pos, ruleStart, nextDot);
-        if (!resultingState) {
-            resultingState = stateSets.getOrCreate(pos, ruleStart, nextDot, rule);
-            if (!newStates) newStates = [];
-            newStates.push(resultingState);
-        }
-
-        if (originPathTo.has(resultingState))
-            throw new Error("This is a bug: Already went past " + resultingState);
-
-        const viterbiScore: ViterbiScore<S,T> = stateSets.viterbiScores.get(resultingState);
-        const prevViterbi: ViterbiScore<S,T> = stateSets.viterbiScores.get(stateToAdvance);
-
-        const prev:S = !!prevViterbi ? prevViterbi.innerScore : sr.multiplicativeIdentity;
-        const newViterbiScore: ViterbiScore<S,T> = {
-            innerScore: sr.times(completedViterbi, prev),
-            origin: completedState,
-            resultingState
-        };
-
-        if (!viterbiScore
-            ||
-            m.toProbability(viterbiScore.innerScore)<m.toProbability(newViterbiScore.innerScore)
-        ) {
-            stateSets.setViterbiScore(newViterbiScore);
-            if (isCompleted(resultingState)) {
-                if (!newCompletedStates) newCompletedStates = [];
-                newCompletedStates.push(resultingState);
-            }
-        }
-
-    });
-
-    // Add new states to chart
-    if (!!newStates)
-        newStates.forEach(a => stateSets.addState(a));
-
-    // Recurse with new states that are completed
-    if (!!newCompletedStates) newCompletedStates.forEach(resultingState => {
-        const path: Set<State<S,T>> = new Set<State<S,T>>(originPathTo);
-        path.add(resultingState);
-        setViterbiScores(stateSets, resultingState, path, m);
-    });
 }
 

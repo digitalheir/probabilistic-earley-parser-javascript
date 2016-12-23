@@ -1,5 +1,5 @@
 import {Grammar} from "../grammar/grammar";
-import {StateSets} from "./state-sets";
+import {Chart} from "./state/chart";
 import {State, StateWithScore, getActiveCategory} from "./state/state";
 import {Category, isNonTerminal, NonTerminal} from "../grammar/category";
 import {Rule} from "../grammar/rule";
@@ -17,7 +17,7 @@ import {Rule} from "../grammar/rule";
  */
 export function predict<S, T>(index: number,
                               grammar: Grammar<T, S>,
-                              stateSets: StateSets<T, S>) {
+                              stateSets: Chart<T, S>) {
     const statesToPredictOn: Set<State<S, T>> = stateSets.statesActiveOnNonTerminals.get(index);
     if (statesToPredictOn) {
         const newStates = new Set<StateWithScore<S,T>>();

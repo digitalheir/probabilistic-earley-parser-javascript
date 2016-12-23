@@ -153,7 +153,7 @@ export class LeftCorners<T> {
      */
     public add(x: Category<T>, y: Category<T>, probability: number) {
         const newProbability = this.get(x, y)/*defaults to zero*/ + probability;
-        if (!isFinite(newProbability) || newProbability < 0 || newProbability > 1)
+        if (!isFinite(newProbability))
             throw new Error("Invalid left-[*]-corner probability: " + newProbability + " for " + x + " -L> " + y + " ... ");
         this.set(x, y, newProbability);
     }

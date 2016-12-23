@@ -136,29 +136,33 @@ export class GrammarBuilder<T, SemiringType> {
         return this;
     }
 
-    addRule(prob: number, lhs: NonTerminal, rhs: Category<T>[]): GrammarBuilder<T, SemiringType> {
-        if (!prob || typeof prob !== 'number') throw new Error("Probability not defined: " + prob);
-        if (!lhs) throw new Error("Left hand side not defined: " + lhs);
-        if (!rhs || !rhs.length || typeof rhs.length !== 'number'! || rhs.length <= 0)            throw new Error("Right hand side not defined: " + rhs);
+    addNewRule(probability: number, left: NonTerminal, right: Category<T>[]): GrammarBuilder<T, SemiringType> {
+        this.addRule({
+            left,
+            right,
+            probability
+        });
 
-        if (this.ruleMap.has(lhs)) {
-            this.ruleMap.get(lhs).forEach(rle => {
-                if (rhs.length === rle.right.length) {
-                    for (let i = 0; i < rhs.length; i++) if (rhs[i] !== rle.right[i]) return;
-                    throw new Error("Already added rule " + rule);
+        return this;
+    }
+
+    addRule(rule: Rule<T>) {
+        if (!rule.probability || typeof rule.probability !== 'number')
+            throw new Error("Probability not defined: " + rule.probability);
+        if (!rule.left) throw new Error("Left hand side not defined: " + rule.left);
+        if (!rule.right || !rule.right.length || typeof rule.right.length !== 'number'! || rule.right.length <= 0)
+            throw new Error("Right hand side not defined: " + rule.right);
+
+        if (this.ruleMap.has(rule.left)) {
+            this.ruleMap.get(rule.left).forEach(rle => {
+                if (rule.right.length === rle.right.length) {
+                    for (let i = 0; i < rule.right.length; i++) if (rule.right[i] !== rle.right[i]) return;
+                    throw new Error("Already added rule " + rule.left + " -> " + rule.right.toString());
                 }
             })
         }
 
-        const rule = {
-            left: lhs,
-            right: rhs,
-            probability: prob
-        };
-        // this.rules.add(rule);
-        getOrCreateSet(this.ruleMap, lhs).add(rule);
-
-        return this;
+        getOrCreateSet(this.ruleMap, rule.left).add(rule);
     }
 
     build(): Grammar<T, SemiringType> {

@@ -4,13 +4,13 @@ import {Rule, isUnitProduction} from "../../src/grammar/rule";
 
 import * as Mocha from 'mocha'
 import {expect} from 'chai';
-import {StateSets} from "../../src/earley/state-sets";
+import {Chart} from "../../src/earley/state/chart";
 import {g} from "../sample-grammar";
 import {isPassive, isCompleted} from "../../src/earley/state/state";
 
 describe('State', () => {
     it('isUnitProduction should behave correctly', () => {
-        const ss = new StateSets<string, number>(g);
+        const ss = new Chart<string, number>(g);
         //ss.addState()
         expect(ss.states).to.exist;
         g.rules.forEach((rule: Rule<string>, i) => {
@@ -20,7 +20,7 @@ describe('State', () => {
     });
 
     it('isPassive should behave correctly', () => {
-        const ss = new StateSets<string, number>(g);
+        const ss = new Chart<string, number>(g);
         //ss.addState()
         expect(ss.states).to.exist;
         g.rules.forEach((r: Rule<string>, i) => {
@@ -31,7 +31,7 @@ describe('State', () => {
     });
 
     it('isCompleted should behave correctly', () => {
-        const ss = new StateSets<string, number>(g);
+        const ss = new Chart<string, number>(g);
         //ss.addState()
         expect(ss.states).to.exist;
         g.rules.forEach((r: Rule<string>, i) => {

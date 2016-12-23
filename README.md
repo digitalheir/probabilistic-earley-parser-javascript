@@ -20,7 +20,71 @@ In many cases Earley also parses faster than CYK (sparse grammars) and it doesn'
 rewritten in any normal form.
    
 ## Usage
-todo
+````javascript
+        // Nonterminals are string
+        const S = "S"; // : NonTerminal 
+        const NP = "NP"; // : NonTerminal 
+        const VP = "VP"; // : NonTerminal 
+        const TV = "TV"; // : NonTerminal 
+        const Det = "Det"; // : NonTerminal 
+        const N = "N"; // : NonTerminal 
+        const Mod = "Mod"; // : NonTerminal 
+
+        // Terminals are functions that should return true when the parameter is of given type
+        const transitiveVerb = (token) => !!token.match(/(hit|chased)/); // : Terminal<string>
+        const the = (token) => !!token.match(/the/i);// : Terminal<string> 
+        const a = (token) => !!token.match(/a/i);// : Terminal<string> 
+        const man = (token) => !!token.match(/man/);// : Terminal<string> 
+        const stick = (token) => !!token.match(/stick/);// : Terminal<string> 
+        const with_ = (token) => !!token.match(/with/);// : Terminal<string> 
+
+        const grammar = Grammar.builder("test") //: Grammar<string,number> 
+            .addNewRule(
+                1.0,   // Probability between 0.0 and 1.0, defaults to 1.0. The builder takes care of converting it to the semiring element
+                S,     // Left hand side of the rule
+                [NP, VP] // Right hand side of the rule
+            )
+            // NP -> Det N (1.0)
+            .addNewRule(
+                1.0,
+                NP,
+                [Det, N] // eg. The man
+            )
+            // NP -> Det N Mod (1.0)
+            .addNewRule(
+                1.0,
+                NP,
+                [Det, N, Mod] // eg. The man (with a stick)
+            )
+            // VP -> TV NP Mod (0.4)
+            .addNewRule(
+                0.4,
+                VP,
+                [TV, NP, Mod] // eg. (chased) (the man) (with a stick)
+            )
+            // VP -> TV NP (0.6)
+            .addNewRule(
+                0.6,
+                VP,
+                [TV, NP] // eg. (chased) (the man with a stick)
+            )
+            .addNewRule(1.0, Det, [a])
+            .addNewRule(1.0, Det, [the])
+            .addNewRule(1.0, N, [man])
+            .addNewRule(1.0, N, [stick])
+            .addNewRule(1.0, TV, [transitiveVerb])
+            .addNewRule(1.0, Mod, [with_, NP]) // eg. with a stick
+            .build();
+
+        const tokens = ["The", "man", "chased", "the", "man", "with", "a", "stick"];
+        const viterbi = getViterbiParse(
+            S,
+            grammar,
+            tokens
+        ); // : ParseTreeWithScore<string>
+        console.log(JSON.stringify(viterbi.parseTree)); // {"category":"<start>","children":[{"category":"S","children":[{"category":"NP","children":[{"category":"Det","children":[{"token":"The","children":[    ]}]},{"category":"N","children":[{"token":"man","children":[]}]}]},{"category":"VP","children":[{"category":"TV","children":[{"token":"chased","children":[]}]},{"category":"NP","children":[{"category":"Det","children":[{"token":"the","children":[]}]},{"category":"N","children":[{"token":"man","c        hildren":[]}]},{"category":"Mod","children":[{"token":"with","children":[]},{"category":"NP","children":[{"category":"Det","children":[{"token":"a",        "children":[]}]},{"category":"N","children":[{"token":"stick","children":[]}]}]}]}]}]}]}]}
+        console.log(viterbi.probability); // 0.6
+````
 
 ## Some notes on implementation
 Written in TypeScript, compiled to ES5 UMD modules.

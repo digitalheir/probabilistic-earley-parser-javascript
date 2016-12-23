@@ -1,8 +1,8 @@
 //noinspection ES6UnusedImports
 import {Set, Map} from 'core-js'
-import {Rule} from "../grammar/rule";
-import {State} from "./state/state";
-import {getOrCreateMap} from "../util";
+import {Rule} from "../../grammar/rule";
+import {State} from "./state";
+import {getOrCreateMap} from "../../util";
 
 export class StateIndex<SemiringType,TokenType> {
     private states: Map<Rule<TokenType>,

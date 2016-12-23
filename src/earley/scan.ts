@@ -1,6 +1,6 @@
 import {isNonTerminal} from "../grammar/category";
 import {Semiring} from "semiring/semiring";
-import {StateSets} from "./state-sets";
+import {Chart} from "./state/chart";
 import {getActiveCategory, State, advanceDot} from "./state/state";
 
 
@@ -15,7 +15,7 @@ export function scan<S, T>(tokenPosition: number,
                            token: T,
                            //scanProbability:(x:T)=>number,//TODO
                            sr: Semiring<S>,
-                           stateSets: StateSets<T, S>) {
+                           stateSets: Chart<T, S>) {
     // TODO
     //const scanProb:number = !scanProbability ? NaN : scanProbability(tokenPosition);
     const scanProb: S = sr.multiplicativeIdentity;

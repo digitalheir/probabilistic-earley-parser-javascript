@@ -13,14 +13,14 @@ export const a:Terminal<string> = (s) => s === "a";
 
 export const builder = Grammar.builder("test");
 export const g:Grammar<string, number>  = builder
-    .addRule(1.0, A, [B, C, D, E])
-    .addRule(1.0, A, [e])
-    .addRule(1.0, X, [Y, Z])
-    .addRule(0.5, B, [C])
-    .addRule(0.5, C, [D])
-    .addRule(0.5, D, [E])
-    .addRule(0.5, D, [a])
-    .addRule(0.5, E, [E,E])
-    .addRule(0.5, E, [e])
+    .addNewRule(1.0, A, [B, C, D, E])
+    .addNewRule(1.0, A, [e])
+    .addNewRule(1.0, X, [Y, Z])
+    .addNewRule(0.5, B, [C])
+    .addNewRule(0.5, C, [D])
+    .addNewRule(0.5, D, [E])
+    .addNewRule(0.5, D, [a])
+    .addNewRule(0.5, E, [E,E])
+    .addNewRule(0.5, E, [e])
     //.addRule(0.1, E, [C])
     .build();
