@@ -3,3 +3,4 @@
 /src
 /.yarn.lock
 /*.tgz
+/.travis.yml
