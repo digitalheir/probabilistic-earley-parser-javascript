@@ -1,3 +1,8 @@
+![Build Status](https://travis-ci.org/digitalheir/probabilistic-earley-parser-javascript.svg?branch=master)
+[![npm version](https://badge.fury.io/js/probabilistic-earley-parser.svg)](https://badge.fury.io/js/semiring)
+![dev dependencies](https://img.shields.io/david/dev/digitalheir/probabilistic-earley-parser-javascript.svg)
+![License](https://img.shields.io/npm/l/probabilistic-earley-parser.svg)
+
 # Probabilistic Earley parser
 
 This is an implementation of a probabilistic Earley parsing algorithm, which can parse any Probabilistic Context Free Grammar (PCFG) (also
