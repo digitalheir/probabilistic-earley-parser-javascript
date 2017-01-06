@@ -91,9 +91,10 @@ export function predict<S, T>(index: number,
         });
 
         newStates.forEach(ss => {
-            stateSets.addState(ss.state);
-            stateSets.addForwardScore(ss.state, ss.forwardScore, sr);
-            stateSets.setInnerScore(ss.state, ss.innerScore);
+            const theState = stateSets.getOrCreate(ss.state.position, ss.state.ruleStartPosition,  ss.state.ruleDotPosition,  ss.state.rule, ss.state.scannedToken);
+            
+            stateSets.addForwardScore(theState, ss.forwardScore, sr);
+            stateSets.setInnerScore(theState, ss.innerScore);
         });
     }
 }

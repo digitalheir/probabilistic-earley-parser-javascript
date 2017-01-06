@@ -43,10 +43,11 @@ export function scan<S, T>(tokenPosition: number,
                 token
             );
 
+            const postScanForward = calculateForwardScore(sr, preScanForward, scanProb);
             // Set forward score
             stateSets.setForwardScore(
                 postScanState,
-                calculateForwardScore(sr, preScanForward, scanProb)
+                postScanForward
             );
 
             // Get inner score (no side effects)

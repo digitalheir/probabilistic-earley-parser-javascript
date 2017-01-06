@@ -1,6 +1,6 @@
 {
   "name": "probabilistic-earley-parser",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "A parser for parsing Probabilistic Context Free Grammars",
   "main": "dist/index.js",
   "author": "Maarten Trompper",
@@ -20,7 +20,7 @@
     "@types/mocha": "^2.2.34",
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
-    "ts-node": "^1.7.2",
+    "ts-node": "^2.0.0",
     "typescript": "^2.1.4"
   }
 }

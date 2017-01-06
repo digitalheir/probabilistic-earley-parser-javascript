@@ -146,7 +146,7 @@ export class GrammarBuilder<T, SemiringType> {
         return this;
     }
 
-    addRule(rule: Rule<T>) {
+    addRule(rule: Rule<T>): GrammarBuilder<T, SemiringType> {
         if (!rule.probability || typeof rule.probability !== 'number')
             throw new Error("Probability not defined: " + rule.probability);
         if (!rule.left) throw new Error("Left hand side not defined: " + rule.left);
@@ -163,6 +163,8 @@ export class GrammarBuilder<T, SemiringType> {
         }
 
         getOrCreateSet(this.ruleMap, rule.left).add(rule);
+        
+        return this;
     }
 
     build(): Grammar<T, SemiringType> {

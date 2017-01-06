@@ -95,8 +95,8 @@ describe('parser', () => {
             grammar,
             tokens
         );
-        console.log(JSON.stringify(viterbi.parseTree)); // {"category":"<start>","children":[{"category":"S","children":[{"category":"NP","children":[{"category":"Det","children":[{"token":"The","children":[    ]}]},{"category":"N","children":[{"token":"man","children":[]}]}]},{"category":"VP","children":[{"category":"TV","children":[{"token":"chased","children":[]}]},{"category":"NP","children":[{"category":"Det","children":[{"token":"the","children":[]}]},{"category":"N","children":[{"token":"man","c        hildren":[]}]},{"category":"Mod","children":[{"token":"with","children":[]},{"category":"NP","children":[{"category":"Det","children":[{"token":"a",        "children":[]}]},{"category":"N","children":[{"token":"stick","children":[]}]}]}]}]}]}]}]}
-        console.log(viterbi.probability); // 0.6
+        //console.log(JSON.stringify(viterbi.parseTree)); // {"category":"<start>","children":[{"category":"S","children":[{"category":"NP","children":[{"category":"Det","children":[{"token":"The","children":[    ]}]},{"category":"N","children":[{"token":"man","children":[]}]}]},{"category":"VP","children":[{"category":"TV","children":[{"token":"chased","children":[]}]},{"category":"NP","children":[{"category":"Det","children":[{"token":"the","children":[]}]},{"category":"N","children":[{"token":"man","c        hildren":[]}]},{"category":"Mod","children":[{"token":"with","children":[]},{"category":"NP","children":[{"category":"Det","children":[{"token":"a",        "children":[]}]},{"category":"N","children":[{"token":"stick","children":[]}]}]}]}]}]}]}]}
+        //console.log(viterbi.probability); // 0.6
         //Parser.recognize(S, grammar, Tokens.tokenize("the", "stick", "chased", "the", "man"))
     });
 
@@ -115,9 +115,9 @@ it('should parse aaaaa', () => {
             )
         )).to.equal(true);
 
-        console.log(g.probabilityMapping.toProbability(
+        /*console.log(g.probabilityMapping.toProbability(
             chart.viterbiScores.get(chart.getOrCreate(
                 tokens.length, 0, init.rule.right.length, init.rule
-            )).innerScore));
+            )).innerScore));*/
     });
 });

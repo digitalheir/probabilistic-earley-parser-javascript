@@ -44,8 +44,9 @@ function completeNoViterbi<S,T>(position: number,
             completedState,
             new Atom(innerScore)
         );
+        
+        //TODO investigate error, probably somwhere inners arent added well
 
-        //noinspection Convert2streamapi
         stateSets.getStatesActiveOnNonTerminalWithNonZeroUnitStarScoreToY(j, Y).forEach((stateToAdvance: State<S,T>) => {
             if (j !== stateToAdvance.position) throw new Error("Index failed. This is a bug.");
             // Make i: X_k → lZ·m
@@ -82,6 +83,21 @@ function completeNoViterbi<S,T>(position: number,
             const newStateRule: Rule<T> = stateToAdvance.rule;
             const newStateDotPosition: number = advanceDot(stateToAdvance);
             const newStateRuleStart: number = stateToAdvance.ruleStartPosition;
+
+
+        if(position === 3 && newStateRule.left === "S" && newStateRuleStart === 0 && newStateDotPosition == 1){
+            console.log(stateToAdvance);
+            console.log(
+                grammar.probabilityMapping.toProbability(unitStarScore.resolve())+" * "
+                +grammar.probabilityMapping.toProbability(prevForward.resolve())+" * "
+                +grammar.probabilityMapping.toProbability(unresolvedCompletedInner.resolve())
+                +"~"+
+            grammar.probabilityMapping.toProbability(fw.resolve())
+            );
+            console.log(isPassive(newStateRule, newStateDotPosition)/*isCompleted*/
+                , !isUnitProduction(newStateRule)
+                , !stateSets.has(newStateRule, position, newStateRuleStart, newStateDotPosition));
+        }
 
             addForwardScores.add(
                 newStateRule,

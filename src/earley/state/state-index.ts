@@ -37,7 +37,7 @@ export class StateIndex<SemiringType,TokenType> {
         const m = getOrCreateMap(getOrCreateMap(getOrCreateMap(this.states,
             state.rule), state.position), state.ruleStartPosition);
         if (m.has(state.ruleDotPosition)){
-            // throw new Error("State set already contained state. This is a bug.");
+            throw new Error("State set already contained state. This is a bug.");
         }
         else m.set(state.ruleDotPosition, state);
     }
