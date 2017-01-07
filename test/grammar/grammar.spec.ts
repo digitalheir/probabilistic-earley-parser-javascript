@@ -120,13 +120,10 @@ describe('examples from paper', () => {
         const s03S1 = chart.getState(S2SS, 3, 0, 1);
         expect(prob(α(s03S1))).to.be.above((2 * p * p * q * q * q) - 0.0001).and.below((2 * p * p * q * q * q) + 0.0001);
         expect(prob(γ(s03S1))).to.be.above((2 * p * p * p * q * q * q) - 0.0001).and.below((2 * p * p * p * q * q * q) + 0.0001);
-/*
-        const s33S1 =  new State(Rule.create(sr, Category.START, S), 0, 3, 1);
-        final Set<State> states3s = chart.getStates(3);
-        Assert.assertTrue(states3s.contains(s33S1));
-        expect(prob(α(s33S1)), 2 * (Math.pow(p, 3) * Math.pow(q, 2)), 0.0001);
-        expect(prob(γ(s33S1)), 2 * (Math.pow(p, 3) * Math.pow(q, 2)), 0.0001);
-*/
+
+        expect(prob(α(init))).to.be.above((2 * (Math.pow(p, 3) * Math.pow(q, 2)))-0.0001).and.above((2 * (Math.pow(p, 3) * Math.pow(q, 2)))+0.0001);
+        expect(prob(γ(init))).to.be.above((2 * (Math.pow(p, 3) * Math.pow(q, 2)))-0.0001).and.above((2 * (Math.pow(p, 3) * Math.pow(q, 2)))+0.0001);
+
 /*
 
         for (int j = 0; j <= tokens.size(); j++) {
