@@ -149,7 +149,7 @@ export class LeftCorners<T> {
      *
      * @param x           Left hand side
      * @param y           Right hand side
-     * @param probability number to add
+     * @param probability number to plus
      */
     public add(x: Category<T>, y: Category<T>, probability: number) {
         const newProbability = this.get(x, y)/*defaults to zero*/ + probability;

@@ -8,50 +8,52 @@ import {Semiring} from "semiring/semiring";
 import {getOrCreateSet, getOrCreateMap} from "../../util";
 import {isUnitProduction, Rule, invalidDotPosition} from "../../grammar/rule";
 import {ViterbiScore} from "./viterbi-score";
+import {StateToObjectMap} from "./state-to-object-map";
 
 export class Chart<T, S> {
     readonly grammar: Grammar<T,S>;
 
-    readonly states: StateIndex<S,T>;
-    readonly byIndex: Map<number, Set<State<S, T>>>;
+    private states: StateIndex<S,T>;
+    private byIndex: Map<number, Set<State<S, T>>>;
 
     /**
-     * The forward probability <code>α_i</code> of a state is
+     * The forward probability <code>α_i</code> of a chart is
      * the sum of the probabilities of
-     * all constrained paths of length i that end in that state, do all
+     * all constrained paths of length i that end in that chart, do all
      * paths from start to position i. So this includes multiple
      * instances of the same history, which may happen because of recursion.
      */
-    readonly forwardScores: Map<State<S, T>, S>;
+    private forwardScores: StateToObjectMap<T, S>;
 
     /**
-     * The inner probability <code>γ_{i}</code> of a state
+     * The inner probability <code>γ_{i}</code> of a chart
      * is the sum of the probabilities of all
      * paths of length (i - k) that start at position k (the rule's start position),
-     * and end at the current state and generate the input the input symbols up to k.
-     * Note that this is conditional on the state happening at position k with
+     * and end at the current chart and generate the input the input symbols up to k.
+     * Note that this is conditional on the chart happening at position k with
      * a certain non-terminal X
      */
-    readonly innerScores: Map<State<S, T>, S>;
-    readonly viterbiScores: Map<State<S, T>, ViterbiScore<S,T>>;
+    private innerScores: StateToObjectMap<T,S>;
+    private viterbiScores: StateToObjectMap<T,ViterbiScore<S,T>>;
 
-    readonly completedStates: Map<number, Set<State<S, T>>>;
-    readonly completedStatesFor: Map<number, Map<NonTerminal, Set<State<S, T>>>>;
-    readonly completedStatesThatAreNotUnitProductions: Map<number, Set<State<S, T>>>;
-    readonly statesActiveOnNonTerminals: Map<number, Set<State<S, T>>>;
+    completedStates: Map<number, Set<State<S, T>>>;
+    completedStatesFor: Map<number, Map<NonTerminal, Set<State<S, T>>>>;
+    completedStatesThatAreNotUnitProductions: Map<number, Set<State<S, T>>>;
+    statesActiveOnNonTerminals: Map<number, Set<State<S, T>>>;
 
-    readonly nonTerminalActiveAtIWithNonZeroUnitStarToY: Map<number, Map<NonTerminal, Set<State<S, T>>>>;
-    readonly statesActiveOnTerminals: Map<number, Set<State<S, T>>>;
-    readonly statesActiveOnNonTerminal: Map<NonTerminal, Map<number, Set<State<S, T>>>>;
+    nonTerminalActiveAtIWithNonZeroUnitStarToY: Map<number, Map<NonTerminal, Set<State<S, T>>>>;
+    statesActiveOnTerminals: Map<number, Set<State<S, T>>>;
+    statesActiveOnNonTerminal: Map<NonTerminal, Map<number, Set<State<S, T>>>>;
+    private EMPTY_SET: Set<State<S, T>> = new Set<State<S, T>>();
 
 
     constructor(grammar: Grammar<T,S>) {
         this.states = new StateIndex<S,T>();
         this.grammar = grammar;
 
-        this.forwardScores = new Map<State<S, T>, S>();
-        this.innerScores = new Map<State<S, T>, S>();
-        this.viterbiScores = new Map<State<S, T>, ViterbiScore<S,T>>();
+        this.forwardScores = new StateToObjectMap<T,S>();
+        this.innerScores = new StateToObjectMap<T,S>();
+        this.viterbiScores = new StateToObjectMap<T,ViterbiScore<S,T>>();
         this.byIndex = new Map<number, Set<State<S, T>>>();
         this.completedStates = new Map<number, Set<State<S, T>>>();
         this.completedStatesFor = new Map<number, Map<NonTerminal, Set<State<S, T>>>>();
@@ -101,51 +103,52 @@ export class Chart<T, S> {
             throw new Error("Querying position after what we're on?");
     }
 
-//
-//
-// public Set<State> getStatesActiveOnNonTerminal(NonTerminal y, int position, int beforeOrOnPosition) {
-//     // stateToAdvance.getPosition() <= beforeOrOnPosition;
-//     if (position <= beforeOrOnPosition) {
-//         TIntObjectHashMap<Set<State>> setTIntObjectHashMap = statesActiveOnNonTerminal.get(y);
-//         if (setTIntObjectHashMap != null && setTIntObjectHashMap.containsKey(position))
-//             return setTIntObjectHashMap.get(position);
-//     }
-//     return Collections.emptySet();
-// }
-//
-// public Set<State> getStatesActiveOnNonTerminals(int index) {
-//     if (!statesActiveOnNonTerminals.containsKey(index)) statesActiveOnNonTerminals.put(index, new HashSet<>());
-//     return statesActiveOnNonTerminals.get(index);
-// }
-//
-//
-// public Set<State> getStatesActiveOnTerminals(int index) {
-//     if (!statesActiveOnTerminals.containsKey(index)) statesActiveOnTerminals.put(index, new HashSet<>());
-//     return statesActiveOnTerminals.get(index);
-// }
-
     /**
      * Default zero
      *
-     * @param s state
+     * @param s chart
      * @return forward score so far
      */
     public getForwardScore(s: State<S, T>): S {
-        return this.forwardScores.has(s)
-            ? this.forwardScores.get(s)
-            : this.grammar.probabilityMapping.ZERO;
+        return this.forwardScores.getByStateOrDefault(s, this.grammar.probabilityMapping.ZERO);
     }
 
 
+    addForwardScore(state: State<S,T>, increment: S, semiring: Semiring<S>):S {
+        let theState = state;
+
+        let fw = semiring.plus(this.getForwardScore(theState)/*default zero*/, increment);
+        this.setForwardScore(
+            theState,
+            fw
+        );
+        return fw;
+    }
+
+    setForwardScore(s: State<S,T>, probability: S) {
+        return this.forwardScores.putByState(s, probability);
+    }
+
+    private hasForwardScore(s: State<S, T>): boolean {
+        return this.forwardScores.hasByState(s);
+    }
+
+    public  getState(rule: Rule<T>,
+                     positionInInput: number,
+                     ruleStartPosition: number,
+                     ruleDotPosition: number): State<S,T> {
+        return this.states.getState(rule, positionInInput, ruleStartPosition, ruleDotPosition);
+    }
+
     /**
-     * Adds state if it does not exist yet
+     * Adds chart if it does not exist yet
      *
      * @param positionInInput     State position
      * @param ruleStartPosition    Rule start position
      * @param ruleDotPosition  Rule dot position
      * @param rule         State rule
-     * @param scannedToken The token that was scanned to create this state
-     * @return State specified by parameter. May or may not be in the state table. If not, it is added.
+     * @param scannedToken The token that was scanned to create this chart
+     * @return State specified by parameter. May or may not be in the chart table. If not, it is added.
      */
     public getOrCreate(positionInInput: number,
                        ruleStartPosition: number,
@@ -155,13 +158,13 @@ export class Chart<T, S> {
         if (this.states.has(rule, positionInInput, ruleStartPosition, ruleDotPosition)) {
             return this.states.getState(rule, positionInInput, ruleStartPosition, ruleDotPosition);
         } else {
-            // Add state if it does not exist yet
+            // Add chart if it does not exist yet
             const scannedCategory: Terminal<T> = scannedToken
                 ? <Terminal<T>> rule.right[ruleDotPosition - 1]
                 : undefined;
             const state: State<S, T> = {
                 rule,
-                position:positionInInput,
+                position: positionInInput,
                 ruleStartPosition,
                 ruleDotPosition,
                 scannedToken: scannedToken,
@@ -223,56 +226,80 @@ export class Chart<T, S> {
         }
     }
 
-    addForwardScore(state: State<S,T>, increment: S, semiring: Semiring<S>) {
-        this.forwardScores.set(state, semiring.plus(this.getForwardScore(state)/*default zero*/, increment));
-    }
-
-// public void addInnerScore(State state, double increment) {
-//     innerScores.put(state, semiring.plus(getInnerScore(state)/*default zero*/, increment));
-// }
-//
-    setForwardScore(s: State<S,T>, probability: S) {
-        this.forwardScores.set(s, probability);
-    }
-
     setInnerScore(s: State<S,T>, probability: S) {
-        this.innerScores.set(s, probability);
+        this.innerScores.putByState(s, probability);
     }
 
     /**
      * @param v viterbi score
      */
     setViterbiScore(v: ViterbiScore<S,T>) {
-        this.viterbiScores.set(v.resultingState, v);
+        this.viterbiScores.putByState(v.resultingState, v);
+    }
+
+    getViterbiScore(s: State<S,T>): ViterbiScore<S,T> {
+        /*if (!this.hasViterbiScore(s))
+            throw new Error(
+                "Viterbi not available for chart ("
+                + s.position + ", " + s.ruleStartPosition + ", " + s.ruleDotPosition
+                + ") " + s.rule.left + " -> " + s.rule.right.map(f => f.toString()));
+        else */return this.viterbiScores.getByState(s);
+    }
+
+    hasViterbiScore(s: State<S,T>): boolean {
+        return this.viterbiScores.hasByState(s);
     }
 
     /**
      * Default zero
      *
-     * @param s state
+     * @param s chart
      * @return inner score so far
      */
     public getInnerScore(s: State<S, T>): S {
-        return this.innerScores.has(s)
-            ? this.innerScores.get(s)
-            : this.grammar.probabilityMapping.ZERO;
+        return this.innerScores.getByStateOrDefault(s, this.grammar.probabilityMapping.ZERO);
     }
 
-// public Set<State> getStates(int index) {
+    public getCompletedStatesThatAreNotUnitProductions(position: number) {
+        return this.completedStatesThatAreNotUnitProductions.get(position);
+    }
+
+    public getCompletedStates(position: number) {
+    if(this.completedStates.has(position))
+        return this.completedStates.get(position);
+    else return this.EMPTY_SET;
+    }
+
+    public getStatesActiveOnNonTerminals(index: number) {
+        return this.statesActiveOnNonTerminals.get(index);
+    }
+
+    public getStatesActiveOnTerminals(index: number) {
+        return this.statesActiveOnTerminals.get(index);
+    }
+
+    // public hasInnerScore(s: State<S, T>): boolean {
+    //     let ruleMap = getOrCreateMap(this.innerScores, s.rule);
+    //     let posMap = getOrCreateMap(ruleMap, s.position);
+    //     let dotMAp = getOrCreateMap(posMap, s.ruleStartPosition);
+    //     return dotMAp.has(s.ruleDotPosition);
+    // }
+
+// public Set<State> getStatesByIndex(int index) {
 //     return byIndex.get(index);
 // }
 //
 //
-// public void add(State state) {
-//     Rule rule = state.getRule();
-//     int ruleStart = state.getRuleStartPosition();
-//     int index = state.getPosition();
+// public void plus(State chart) {
+//     Rule rule = chart.getRule();
+//     int ruleStart = chart.getRuleStartPosition();
+//     int index = chart.getPosition();
 //
 //     TIntObjectMap<TIntObjectMap<State>> forRuleStart = states.getRuleStartToDotToState(rule, index);
 //     if (!forRuleStart.containsKey(ruleStart)) forRuleStart.put(ruleStart, new TIntObjectHashMap<>(50));
 //     TIntObjectMap<State> dotToState = forRuleStart.get(ruleStart);
 //
-//     addState(dotToState, state);
+//     addState(dotToState, chart);
 // }
 //
 // public synchronized State getSynchronized(int index, int ruleStart, int ruleDot, Rule rule) {
@@ -283,10 +310,8 @@ export class Chart<T, S> {
 //     return states.getState(rule, index, ruleStart, ruleDot);
 // }
 //
-// public int countStates() {
-//     //noinspection unchecked
-//     return Arrays.stream(byIndex.values(new Set[byIndex.size()]))
-//         .mapToInt(Set::size).sum();
+// public countStates():number {
+//         return this.states.count();
 // }
-//
+
 }

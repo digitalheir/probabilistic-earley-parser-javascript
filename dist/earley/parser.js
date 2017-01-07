@@ -5,11 +5,11 @@
     else if (typeof define === 'function' && define.amd) {
         define(dependencies, factory);
     }
-})(["require", "exports", "../grammar/category", "./state/viterbi-score", "./state/chart", "./scan", "./predict", "./complete", "./parsetree"], function (require, exports) {
+})(["require", "exports", "../grammar/category", "./chart/viterbi-score", "./chart/chart", "./scan", "./predict", "./complete", "./parsetree"], function (require, exports) {
     "use strict";
     var category_1 = require("../grammar/category");
-    var viterbi_score_1 = require("./state/viterbi-score");
-    var chart_1 = require("./state/chart");
+    var viterbi_score_1 = require("./chart/viterbi-score");
+    var chart_1 = require("./chart/chart");
     var scan_1 = require("./scan");
     var predict_1 = require("./predict");
     var complete_1 = require("./complete");
@@ -18,8 +18,8 @@
         var state = stateSets.getOrCreate(index, ruleStartPosition, ruleDotPosition, rule);
         stateSets.setInnerScore(state, inner);
         stateSets.setForwardScore(state, forward);
-        if (!!stateSets.viterbiScores.get(state))
-            throw new Error("Viterbi score was already set for new state?!");
+        if (stateSets.hasViterbiScore(state))
+            throw new Error("Viterbi score was already set for new chart?!");
         return state;
     }
     function getViterbiParseFromChart(state, chart) {
@@ -30,13 +30,13 @@
                 var prefixEnd = state.rule.right[state.ruleDotPosition - 1];
                 if (!category_1.isNonTerminal(prefixEnd)) {
                     if (!state.scannedToken)
-                        throw new Error("Expected state to be a scanned state. This is a bug.");
+                        throw new Error("Expected chart to be a scanned chart. This is a bug.");
                     var T = getViterbiParseFromChart(chart.getOrCreate(state.position - 1, state.ruleStartPosition, state.ruleDotPosition - 1, state.rule), chart);
                     parsetree_1.addRightMost(T, { token: state.scannedToken, category: state.scannedCategory, children: [] });
                     return T;
                 }
                 else {
-                    var viterbi = chart.viterbiScores.get(state);
+                    var viterbi = chart.getViterbiScore(state);
                     var origin = viterbi.origin;
                     var T = getViterbiParseFromChart(chart.getOrCreate(origin.ruleStartPosition, state.ruleStartPosition, state.ruleDotPosition - 1, state.rule), chart);
                     var Tprime = getViterbiParseFromChart(origin, chart);
@@ -55,7 +55,7 @@
             scan_1.scan(i, token, grammar.probabilityMapping.semiring, stateSets);
             complete_1.complete(i + 1, stateSets, grammar);
             var completedStates = [];
-            var completedStatez = stateSets.completedStates.get(i + 1);
+            var completedStatez = stateSets.getCompletedStates(i + 1);
             if (!!completedStatez)
                 completedStatez.forEach(function (s) { return completedStates.push(s); });
             completedStates.forEach(function (s) { return viterbi_score_1.setViterbiScores(stateSets, s, new Set(), grammar.probabilityMapping); });
@@ -69,7 +69,7 @@
         var finalState = chart.getOrCreate(tokens.length, 0, init.rule.right.length, init.rule);
         var parseTree = getViterbiParseFromChart(finalState, chart);
         var toProbability = grammar.probabilityMapping.toProbability;
-        var finalScore = chart.viterbiScores.get(finalState).innerScore;
+        var finalScore = chart.getViterbiScore(finalState).innerScore;
         return {
             parseTree: parseTree,
             probability: toProbability(finalScore)

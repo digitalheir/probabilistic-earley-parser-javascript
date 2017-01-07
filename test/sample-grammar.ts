@@ -9,7 +9,7 @@ export const X:NonTerminal = "X";
 export const Y:NonTerminal = "Y";
 export const Z:NonTerminal = "Z";
 export const e:Terminal<string> = (s) => s === "e";
-export const a:Terminal<string> = (s) => s === "a";
+export const a = (t:string) =>!!t.match(/a/i);
 
 export const builder = Grammar.builder("test");
 export const g:Grammar<string, number>  = builder
@@ -23,4 +23,16 @@ export const g:Grammar<string, number>  = builder
     .addNewRule(0.5, E, [E,E])
     .addNewRule(0.5, E, [e])
     //.addRule(0.1, E, [C])
+    .build();
+
+export const p:number = (0.6);
+export const q:number = (0.4);
+export const S = "S";
+
+export const S2a = {left: S, right:[a],probability:p};
+export const S2SS = {left: S, right:[S,S],probability:q};
+
+export const simpleRecursiveGrammar:Grammar<string, number> = Grammar.builder("simple-recursive-grammar")
+    .addRule(S2a)
+    .addRule(S2SS)
     .build();

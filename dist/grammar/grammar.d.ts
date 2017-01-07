@@ -35,6 +35,6 @@ export declare class GrammarBuilder<T, SemiringType> {
     constructor(semiringMapping: ProbabilitySemiringMapping<SemiringType>, name?: string);
     setSemiringMapping(semiringMapping: ProbabilitySemiringMapping<SemiringType>): this;
     addNewRule(probability: number, left: NonTerminal, right: Category<T>[]): GrammarBuilder<T, SemiringType>;
-    addRule(rule: Rule<T>): void;
+    addRule(rule: Rule<T>): GrammarBuilder<T, SemiringType>;
     build(): Grammar<T, SemiringType>;
 }

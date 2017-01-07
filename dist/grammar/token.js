@@ -7,11 +7,11 @@
     }
 })(["require", "exports"], function (require, exports) {
     "use strict";
-    function from(source) {
+    function wrapped(source) {
         if (!source)
             throw new Error("Source object can't be null for an instantiated token.");
         return { source: source };
     }
-    exports.from = from;
+    exports.wrapped = wrapped;
 });
 //# sourceMappingURL=token.js.map

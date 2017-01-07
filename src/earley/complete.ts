@@ -1,13 +1,12 @@
-import {State, getActiveCategory, advanceDot, isPassive, isCompleted} from "./state/state";
-import {Chart} from "./state/chart";
+import {State, getActiveCategory, advanceDot, isPassive, isCompleted} from "./chart/state";
+import {Chart} from "./chart/chart";
 import {Grammar} from "../grammar/grammar";
 import {NonTerminal, Category} from "../grammar/category";
 import {Rule, isUnitProduction} from "../grammar/rule";
-import {makeDeferrable} from "semiring";
 import {Expression} from "semiring/abstract-expression/expression";
-import {DeferredStateScoreComputations} from "./state/addable-expressions-container";
+import {DeferredStateScoreComputations} from "./chart/addable-expressions-container";
 import {Atom} from "semiring/abstract-expression/atom";
-import {StateIndex} from "./state/state-index";
+import {S2SS} from "../../test/sample-grammar";
 /**
  * Completes states exhaustively and makes resolvable expressions for the forward and inner scores.
  * Note that these expressions can only be resolved to actual values after finishing completion, because they may depend on one another.
@@ -37,6 +36,16 @@ function completeNoViterbi<S,T>(position: number,
         const j: number = completedState.ruleStartPosition;
         //noinspection JSSuspiciousNameCombination
         const Y: NonTerminal = completedState.rule.left;
+        const probM = grammar.probabilityMapping;
+
+        let newVar = addInnerScores.get(
+            S2SS,
+            3,
+            0,
+            2
+        );
+        console.log("nao: "+ " ("
+            + Math.exp(-(newVar?newVar.resolve():Infinity)) + ")");
 
         const innerScore: S = stateSets.getInnerScore(completedState);
         // TODO pre-create atom?
@@ -44,7 +53,17 @@ function completeNoViterbi<S,T>(position: number,
             completedState,
             new Atom(innerScore)
         );
-        
+
+        let newVar2 = addInnerScores.get(
+            S2SS,
+            3,
+            0,
+            2
+        );
+        console.log("nao2: "+ " ("
+            + Math.exp(-(newVar2?newVar2.resolve():Infinity)) + ")");
+
+
         //TODO investigate error, probably somwhere inners arent added well
 
         stateSets.getStatesActiveOnNonTerminalWithNonZeroUnitStarScoreToY(j, Y).forEach((stateToAdvance: State<S,T>) => {
@@ -64,7 +83,6 @@ function completeNoViterbi<S,T>(position: number,
             const Z: Category<T> = getActiveCategory(stateToAdvance);
 
             // TODO pre-create atom?
-            const probM = grammar.probabilityMapping;
             const unitStarScore: Expression<S> = new Atom(
                 probM.fromProbability(
                     grammar.getUnitStarScore(Z, Y)
@@ -85,21 +103,7 @@ function completeNoViterbi<S,T>(position: number,
             const newStateRuleStart: number = stateToAdvance.ruleStartPosition;
 
 
-        if(position === 3 && newStateRule.left === "S" && newStateRuleStart === 0 && newStateDotPosition == 1){
-            console.log(stateToAdvance);
-            console.log(
-                grammar.probabilityMapping.toProbability(unitStarScore.resolve())+" * "
-                +grammar.probabilityMapping.toProbability(prevForward.resolve())+" * "
-                +grammar.probabilityMapping.toProbability(unresolvedCompletedInner.resolve())
-                +"~"+
-            grammar.probabilityMapping.toProbability(fw.resolve())
-            );
-            console.log(isPassive(newStateRule, newStateDotPosition)/*isCompleted*/
-                , !isUnitProduction(newStateRule)
-                , !stateSets.has(newStateRule, position, newStateRuleStart, newStateDotPosition));
-        }
-
-            addForwardScores.add(
+            addForwardScores.plus(
                 newStateRule,
                 position,
                 newStateRuleStart,
@@ -107,14 +111,16 @@ function completeNoViterbi<S,T>(position: number,
                 fw
             );
 
-            // If this is a new completed state that is no unit production,
+
+
+            // If this is a new completed chart that is no unit production,
             // make a note of it it because we want to recursively call *complete* on these states
             if (
                 isPassive(newStateRule, newStateDotPosition)/*isCompleted*/
                 && !isUnitProduction(newStateRule)
                 && !stateSets.has(newStateRule, position, newStateRuleStart, newStateDotPosition)) {
                 if (!possiblyNewStates) possiblyNewStates = new DeferredStateScoreComputations<S,T>(sr);
-                possiblyNewStates.add(
+                possiblyNewStates.plus(
                     newStateRule,
                     position,
                     newStateRuleStart,
@@ -123,12 +129,12 @@ function completeNoViterbi<S,T>(position: number,
                 );
             }
 
-            addInnerScores.add(
+            addInnerScores.plus(
                 newStateRule,
                 position,
                 newStateRuleStart,
                 newStateDotPosition,
-                inner
+                inner,true
             );
         });
     });
@@ -144,9 +150,13 @@ function completeNoViterbi<S,T>(position: number,
              score: Expression<S>) => {
                 //const isNew: boolean = !stateSets.has(index, ruleStart, dot, rule);
 
+                if (stateSets.has(rule, index, ruleStart, dot)) {
+                    throw new Error("State wasn't new");
+                }
+
                 const state: State<S,T> = stateSets.getOrCreate(index, ruleStart, dot, rule);
-                if (/*!isNew || */!isCompleted(state) || isUnitProduction(state.rule))
-                    throw new Error("Unexpected state found in possible new states. This is a bug.");
+                if (!isCompleted(state) || isUnitProduction(state.rule))
+                    throw new Error("Unexpected chart found in possible new states. This is a bug.");
 
                 newCompletedStates.add(state);
             });
@@ -174,7 +184,8 @@ export function complete<S,T>(i: number,
     const addForwardScores = new DeferredStateScoreComputations(grammar.deferrableSemiring);
     const addInnerScores = new DeferredStateScoreComputations(grammar.deferrableSemiring);
 
-    const completeOnStates = stateSets.completedStatesThatAreNotUnitProductions.get(i);
+    const completeOnStates = stateSets.getCompletedStatesThatAreNotUnitProductions(i);
+
     if (!!completeOnStates) completeNoViterbi(
         i,
         completeOnStates,
@@ -187,11 +198,13 @@ export function complete<S,T>(i: number,
     // Resolve and set forward score
     addForwardScores.forEach((position, ruleStart, dot, rule, score) => {
         const state: State<S,T> = stateSets.getOrCreate(position, ruleStart, dot, rule);
+        // TODO dont getorcreate chart
         stateSets.setForwardScore(state, score.resolve());
     });
 
     // Resolve and set inner score
     addInnerScores.forEach((position, ruleStart, dot, rule, score) => {
+        // TODO dont getorcreate chart
         const state: State<S,T> = stateSets.getOrCreate(position, ruleStart, dot, rule);
         stateSets.setInnerScore(state, score.resolve());
     });

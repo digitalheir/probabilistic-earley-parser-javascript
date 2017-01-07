@@ -9,7 +9,6 @@ import {
 } from './left-corner'
 
 import Semiring from "semiring/semiring";
-import {fromProbability, toProbability} from "semiring/semirings/log";
 import {LogSemiring, makeDeferrable} from "semiring";
 import {Expression} from "semiring/abstract-expression/expression";
 
@@ -97,6 +96,7 @@ export class Grammar<T, SemiringType> {
         return this.unitStarScores.get(from, to);
     }
 
+    //noinspection JSUnusedGlobalSymbols
     static withSemiring<T,Y>(semiringMapping: ProbabilitySemiringMapping<Y>, name?: string): GrammarBuilder<T, Y> {
         return new GrammarBuilder<T, Y>(semiringMapping, name);
     }
@@ -104,7 +104,6 @@ export class Grammar<T, SemiringType> {
     static builder<T>(name?: string): GrammarBuilder<T, number> {
         return new GrammarBuilder<T, number>(LOG_SEMIRING, name);
     }
-
 
 }
 
@@ -131,6 +130,7 @@ export class GrammarBuilder<T, SemiringType> {
         this.semiringMapping = semiringMapping;
     }
 
+    //noinspection JSUnusedGlobalSymbols
     setSemiringMapping(semiringMapping: ProbabilitySemiringMapping<SemiringType>) {
         this.semiringMapping = semiringMapping;
         return this;

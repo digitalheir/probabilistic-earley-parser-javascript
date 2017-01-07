@@ -1,15 +1,15 @@
 import {Grammar} from "../grammar/grammar";
 import {NonTerminal, Category, isNonTerminal} from "../grammar/category";
 import {Rule} from "../grammar/rule";
-import {State} from "./state/state";
-import {setViterbiScores, ViterbiScore} from "./state/viterbi-score";
-import {Chart} from "./state/chart";
+import {State} from "./chart/state";
+import {setViterbiScores, ViterbiScore} from "./chart/viterbi-score";
+import {Chart} from "./chart/chart";
 import {scan} from "./scan";
 import {predict} from "./predict";
 import {complete} from "./complete";
 import {ParseTree, addRightMost} from "./parsetree";
 
-function addState<S,T>(stateSets: Chart<T, S>,
+export function addState<S,T>(stateSets: Chart<T, S>,
                        index: number,
                        ruleStartPosition: number,
                        ruleDotPosition: number,
@@ -19,15 +19,16 @@ function addState<S,T>(stateSets: Chart<T, S>,
     const state = stateSets.getOrCreate(index, ruleStartPosition, ruleDotPosition, rule);
     stateSets.setInnerScore(state, inner);
     stateSets.setForwardScore(state, forward);
-    if (!!stateSets.viterbiScores.get(state))
-        throw new Error("Viterbi score was already set for new state?!");
+
+    if (stateSets.hasViterbiScore(state))
+        throw new Error("Viterbi score was already set for new chart?!");
     // stateSets.setViterbiScore(
     //     {
     //         origin: null,
     //         innerScore:
     //     }
     //         State.ViterbiScore(
-    //         grammar.getSemiring().one(), null, state, grammar.getSemiring()
+    //         grammar.getSemiring().one(), null, chart, grammar.getSemiring()
     //     )
     // );
     return state;
@@ -39,14 +40,14 @@ function addState<S,T>(stateSets: Chart<T, S>,
 export function getViterbiParseFromChart<S,T>(state: State<S,T>, chart: Chart<T, S>): ParseTree<T> {
     switch (state.ruleDotPosition) {
         case 0:
-            // Prediction state
+            // Prediction chart
             return {category: state.rule.left, children: []};
         default:
             const prefixEnd: Category<T> = state.rule.right[state.ruleDotPosition - 1];
             if (!isNonTerminal(prefixEnd)) {
-                // Scanned terminal state
+                // Scanned terminal chart
                 if (!state.scannedToken)
-                    throw new Error("Expected state to be a scanned state. This is a bug.");
+                    throw new Error("Expected chart to be a scanned chart. This is a bug.");
 
                 // let \'a = \, call
                 const T: ParseTree<T> = getViterbiParseFromChart(
@@ -61,13 +62,13 @@ export function getViterbiParseFromChart<S,T>(state: State<S,T>, chart: Chart<T,
                 addRightMost(T, {token: state.scannedToken, category: state.scannedCategory, children: []});
                 return T;
             } else {
-                // Completed non-terminal state
-                const viterbi: ViterbiScore<S,T> = chart.viterbiScores.get(state); // must exist
+                // Completed non-terminal chart
+                const viterbi: ViterbiScore<S,T> = chart.getViterbiScore(state); // must exist
 
-                // Completed state that led to the current state
+                // Completed chart that led to the current chart
                 const origin: State<S,T> = viterbi.origin;
 
-                // Recurse for predecessor state (before the completion happened)
+                // Recurse for predecessor chart (before the completion happened)
                 const T: ParseTree<T> = getViterbiParseFromChart(
                     chart.getOrCreate(
                         origin.ruleStartPosition,
@@ -77,7 +78,7 @@ export function getViterbiParseFromChart<S,T>(state: State<S,T>, chart: Chart<T,
                     )
                     , chart);
 
-                // Recurse for completed state
+                // Recurse for completed chart
                 const Tprime: ParseTree<T> = getViterbiParseFromChart(origin, chart);
 
                 addRightMost(T, Tprime);
@@ -92,7 +93,7 @@ export function parseSentenceIntoChart<S,T>(Start: NonTerminal,
     //ScanProbability scanProbability//TODO
 
     const stateSets: Chart<T,S> = new Chart(grammar);
-    // Initial state
+    // Initial chart
     //const initialState:State<S,T> = undefined;//todo
     // new State(
     //     Rule.create(sr, 1.0, Category.START, S), 0
@@ -114,7 +115,7 @@ export function parseSentenceIntoChart<S,T>(Start: NonTerminal,
             complete(i + 1, stateSets, grammar);
 
             const completedStates: State<S,T>[] = [];
-            const completedStatez = stateSets.completedStates.get(i + 1);
+            const completedStatez = stateSets.getCompletedStates(i + 1);
             if (!!completedStatez) completedStatez.forEach(s => completedStates.push(s));
 
             completedStates.forEach(s => setViterbiScores(stateSets,
@@ -150,7 +151,7 @@ export function getViterbiParse<S,T>(Start: NonTerminal,
 
     const parseTree:ParseTree<T> = getViterbiParseFromChart(finalState, chart);
     const toProbability = grammar.probabilityMapping.toProbability;
-    const finalScore = chart.viterbiScores.get(finalState).innerScore;
+    const finalScore = chart.getViterbiScore(finalState).innerScore;
 
     return {
         parseTree,

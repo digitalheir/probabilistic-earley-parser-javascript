@@ -5,12 +5,12 @@
     else if (typeof define === 'function' && define.amd) {
         define(dependencies, factory);
     }
-})(["require", "exports", "./state/state", "../grammar/category"], function (require, exports) {
+})(["require", "exports", "./chart/state", "../grammar/category"], function (require, exports) {
     "use strict";
-    var state_1 = require("./state/state");
+    var state_1 = require("./chart/state");
     var category_1 = require("../grammar/category");
     function predict(index, grammar, stateSets) {
-        var statesToPredictOn = stateSets.statesActiveOnNonTerminals.get(index);
+        var statesToPredictOn = stateSets.getStatesActiveOnNonTerminals(index);
         if (statesToPredictOn) {
             var newStates_1 = new Set();
             var probMap_1 = grammar.probabilityMapping;
@@ -27,11 +27,23 @@
                             var Y = Y_to_v.left;
                             var Y_to_vScore = fromProb_1(Y_to_v.probability);
                             var fw = sr_1.times(prevForward, sr_1.times(fromProb_1(grammar.getLeftStarScore(Z, Y)), Y_to_vScore));
-                            if (stateSets.states.has(Y_to_v, index, index, 0)) {
+                            if (stateSets.has(Y_to_v, index, index, 0)) {
                                 var predicted = stateSets.getOrCreate(index, index, 0, Y_to_v);
                                 var innerScore = stateSets.getInnerScore(predicted);
                                 if (!(Y_to_vScore === innerScore || probMap_1.ZERO === innerScore))
                                     throw new Error(Y_to_vScore + " != " + innerScore);
+                                if (predicted.rule.left === "S"
+                                    && predicted.position === 2
+                                    && predicted.ruleStartPosition === 2
+                                    && predicted.rule.right.length === 1
+                                    && predicted.ruleDotPosition === 0) {
+                                    if (Math.exp(-fw) < 0.1066666666666667
+                                        && Math.exp(-fw) > 0.10666666666666660) {
+                                        console.log("uhh? " + Math.exp(-fw));
+                                    }
+                                    else
+                                        console.log("uhh+ " + Math.exp(-fw));
+                                }
                                 stateSets.addForwardScore(predicted, fw, sr_1);
                                 stateSets.setInnerScore(predicted, Y_to_vScore);
                                 stateSets.setViterbiScore({
@@ -63,9 +75,9 @@
                 });
             });
             newStates_1.forEach(function (ss) {
-                stateSets.addState(ss.state);
-                stateSets.addForwardScore(ss.state, ss.forwardScore, sr_1);
-                stateSets.setInnerScore(ss.state, ss.innerScore);
+                var theState = ss.state;
+                stateSets.addForwardScore(theState, ss.forwardScore, sr_1);
+                stateSets.setInnerScore(theState, ss.innerScore);
             });
         }
     }

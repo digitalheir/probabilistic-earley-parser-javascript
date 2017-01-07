@@ -5,21 +5,14 @@ import * as Mocha from 'mocha'
 import {expect} from 'chai';
 import {scan} from "../../src/earley/scan";
 import {LogSemiring} from "semiring";
-import {ss} from "./state-set.spec";
-import {Chart} from "../../src/earley/state/chart";
+import {Chart} from "../../src/earley/chart/chart";
 import {g, A} from "../sample-grammar";
 import {parseSentenceIntoChart} from "../../src/earley/parser";
 
 //TODO
 describe('parser', () => {
-    it('should scan correctly', () => {
-        scan(
-            0,
-            "e",
-            LogSemiring,
-            ss
-        )
-    });
+
+
     it('should complete correctly', () => {
         // complete(
         //     0,
@@ -109,7 +102,7 @@ it('should parse aaaaa', () => {
             tokens
         );
 
-        expect(chart.completedStates.get(tokens.length).has(
+        expect(chart.getCompletedStates(tokens.length).has(
             chart.getOrCreate(
                 tokens.length, 0, init.rule.right.length, init.rule
             )

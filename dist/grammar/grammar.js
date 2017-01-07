@@ -111,6 +111,7 @@
                 });
             }
             getOrCreateSet(this.ruleMap, rule.left).add(rule);
+            return this;
         };
         GrammarBuilder.prototype.build = function () {
             return new Grammar(this.name, this.ruleMap, this.semiringMapping);

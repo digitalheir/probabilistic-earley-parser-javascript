@@ -5,8 +5,8 @@ import {Chart} from "./chart";
 import {NonTerminal} from "../../grammar/category";
 
 /**
- * Representing a Viterbi score coming from a certain state,
- * transition to a result state computing
+ * Representing a Viterbi score coming from a certain chart,
+ * transition to a result chart computing
  * using a certain semiring
  */
 export interface ViterbiScore<S, T> {
@@ -25,7 +25,7 @@ export interface ViterbiScore<S, T> {
  * ~This method does not guarantee a left most parse.~
  *
  * @param stateSets
- * @param completedState Completed state to calculate Viterbi score for
+ * @param completedState Completed chart to calculate Viterbi score for
  * @param originPathTo
  * @param m
  *///TODO write tests
@@ -37,16 +37,18 @@ export function setViterbiScores<S,T>(stateSets: Chart<T, S>,
     let newStates: State<S,T>[] = null; // init as null to avoid array creation
     let newCompletedStates: State<S,T>[] = null; // init as null to avoid array creation
 
-    if (!stateSets.viterbiScores.has(completedState))
-        throw new Error("Expected Viterbi score to be set on completed state. This is a bug.");
+    if (!stateSets.hasViterbiScore(completedState))
+        throw new Error("Expected Viterbi score to be set on completed chart. This is a bug.");
 
-    const completedViterbi: S = stateSets.viterbiScores
-        .get(completedState)
+    const completedViterbi: S = stateSets
+        .getViterbiScore(completedState)
         .innerScore;
 
 
 
+    //noinspection JSSuspiciousNameCombination
     const Y: NonTerminal = completedState.rule.left;
+
     //Get all states in j <= i, such that <code>j: X<sub>k</sub> →  λ·Yμ</code>
     const pos: number = completedState.position;
     stateSets.getStatesActiveOnNonTerminal(
@@ -59,7 +61,7 @@ export function setViterbiScores<S,T>(stateSets: Chart<T, S>,
         const nextDot: number = advanceDot(stateToAdvance);
         const rule: Rule<T> = stateToAdvance.rule;
 
-        let resultingState = stateSets.states.getState(rule, pos, ruleStart, nextDot);
+        let resultingState = stateSets.getState(rule, pos, ruleStart, nextDot);
         if (!resultingState) {
             resultingState = stateSets.getOrCreate(pos, ruleStart, nextDot, rule);
             if (!newStates) newStates = [];
@@ -69,8 +71,8 @@ export function setViterbiScores<S,T>(stateSets: Chart<T, S>,
         if (originPathTo.has(resultingState))
             throw new Error("This is a bug: Already went past " + resultingState);
 
-        const viterbiScore: ViterbiScore<S,T> = stateSets.viterbiScores.get(resultingState);
-        const prevViterbi: ViterbiScore<S,T> = stateSets.viterbiScores.get(stateToAdvance);
+        const viterbiScore: ViterbiScore<S,T> = stateSets.getViterbiScore(resultingState);
+        const prevViterbi: ViterbiScore<S,T> = stateSets.getViterbiScore(stateToAdvance);
 
         const prev:S = !!prevViterbi ? prevViterbi.innerScore : sr.multiplicativeIdentity;
         const newViterbiScore: ViterbiScore<S,T> = {

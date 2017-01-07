@@ -1,1 +1,1 @@
-{"version":3,"file":"token.js","sourceRoot":"","sources":["../../src/grammar/token.ts"],"names":[],"mappings":";;;;;;;;;IA8BA,cAAwB,MAAS;QAC7B,EAAE,CAAC,CAAC,CAAC,MAAM,CAAC;YACR,MAAM,IAAI,KAAK,CAAC,wDAAwD,CAAC,CAAC;QAC9E,MAAM,CAAC,EAAC,MAAM,QAAA,EAAC,CAAC;IACpB,CAAC;IAJD,oBAIC"}
+{"version":3,"file":"token.js","sourceRoot":"","sources":["../../src/grammar/token.ts"],"names":[],"mappings":";;;;;;;;;IAGA,iBAA2B,MAAS;QAChC,EAAE,CAAC,CAAC,CAAC,MAAM,CAAC;YAAC,MAAM,IAAI,KAAK,CAAC,wDAAwD,CAAC,CAAC;QACvF,MAAM,CAAC,EAAC,MAAM,QAAA,EAAC,CAAC;IACpB,CAAC;IAHD,0BAGC"}

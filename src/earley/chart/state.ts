@@ -2,20 +2,20 @@ import {Rule, getActiveCategory as getActiveCategoryFromRule, invalidDotPosition
 import {Category} from "../../grammar/category";
 
 /**
- * A chart state, describing a pending derivation.
+ * A chart chart, describing a pending derivation.
  * <p/>
- * A state is of the form <code>i: X<sub>k</sub> → λ·μ</code>
+ * A chart is of the form <code>i: X<sub>k</sub> → λ·μ</code>
  * where X is a nonterminal of the grammar, λ and μ are strings of nonterminals and/or
  * terminals, and i and k are indices into the input string. States are derived from productions
- * in the grammar. The above state is derived from a corresponding production
+ * in the grammar. The above chart is derived from a corresponding production
  * X → λμ
  * with the following semantics:
  * <ul>
  * <li>The current position in the input is <code>i</code>, i.e., <code>x<sub>0</sub>...x<sub>i-1</sub></code>
  * have been processed
- * so far. The states describing the parser state at position <code>i</code> are collectively
- * called state set <code>i</code>. Note that there is one more state set than input
- * symbols: set <code>0</code> describes the parser state before any input is processed,
+ * so far. The states describing the parser chart at position <code>i</code> are collectively
+ * called chart set <code>i</code>. Note that there is one more chart set than input
+ * symbols: set <code>0</code> describes the parser chart before any input is processed,
  * while set <code>|x|</code> contains the states after all input symbols have been
  * processed.</li>
  * <li>Nonterminal <code>X</code> was expanded starting at position <code>k</code> in
@@ -26,7 +26,7 @@ import {Category} from "../../grammar/category";
  * the dot. The dot thus refers to the current position <code>i</code>.</li>
  * </ul>
  *
- * A state with the dot to the right of the entire RHS is called a completed state, since
+ * A chart with the dot to the right of the entire RHS is called a completed chart, since
  * it indicates that the left-hand side (LHS) non-terminal has been fully expanded.
  *
  */
@@ -55,7 +55,7 @@ export function isActive<T,E>(state: State<T,E>): boolean {
 }
 
 /**
- * @return Active category for this state. May be null.
+ * @return Active category for this chart. May be null.
  */
 export function getActiveCategory<Semi,Token>(state: State<Semi, Token>): Category<Token> {
     return getActiveCategoryFromRule(state.rule, state.ruleDotPosition);

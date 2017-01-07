@@ -8,7 +8,10 @@
   "scripts": {
     "build:ts": "tsc",
     "build": "npm run build:ts",
-    "test": "mocha -r ts-node/register test/**/*.spec.ts"
+    "test": "mocha -r ts-node/register test/**/*.spec.ts",
+    "test:chart": "mocha -r ts-node/register test/**/chart.spec.ts",
+    "test:grammar": "mocha -r ts-node/register test/**/grammar.spec.ts",
+    "test:earley": "mocha -r ts-node/register test/**/earley.spec.ts"
   },
   "dependencies": {
     "@types/core-js": "0.9.35",

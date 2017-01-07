@@ -5,11 +5,11 @@
     else if (typeof define === 'function' && define.amd) {
         define(dependencies, factory);
     }
-})(["require", "exports", "./state/state", "../grammar/rule", "./state/addable-expressions-container", "semiring/abstract-expression/atom"], function (require, exports) {
+})(["require", "exports", "./chart/state", "../grammar/rule", "./chart/addable-expressions-container", "semiring/abstract-expression/atom"], function (require, exports) {
     "use strict";
-    var state_1 = require("./state/state");
+    var state_1 = require("./chart/state");
     var rule_1 = require("../grammar/rule");
-    var addable_expressions_container_1 = require("./state/addable-expressions-container");
+    var addable_expressions_container_1 = require("./chart/addable-expressions-container");
     var atom_1 = require("semiring/abstract-expression/atom");
     function completeNoViterbi(position, states, addForwardScores, addInnerScores, grammar, stateSets) {
         var possiblyNewStates;
@@ -18,6 +18,7 @@
             var Y = completedState.rule.left;
             var innerScore = stateSets.getInnerScore(completedState);
             var unresolvedCompletedInner = addInnerScores.getOrCreateByState(completedState, new atom_1.Atom(innerScore));
+            var probM = grammar.probabilityMapping;
             stateSets.getStatesActiveOnNonTerminalWithNonZeroUnitStarScoreToY(j, Y).forEach(function (stateToAdvance) {
                 if (j !== stateToAdvance.position)
                     throw new Error("Index failed. This is a bug.");
@@ -26,7 +27,6 @@
                 var forwardScore = stateSets.getForwardScore(stateToAdvance);
                 var prevForward = addForwardScores.getOrCreateByState(stateToAdvance, new atom_1.Atom(forwardScore));
                 var Z = state_1.getActiveCategory(stateToAdvance);
-                var probM = grammar.probabilityMapping;
                 var unitStarScore = new atom_1.Atom(probM.fromProbability(grammar.getUnitStarScore(Z, Y)));
                 var sr = grammar.deferrableSemiring;
                 var fw = sr.times(unitStarScore, sr.times(prevForward, unresolvedCompletedInner));
@@ -34,23 +34,33 @@
                 var newStateRule = stateToAdvance.rule;
                 var newStateDotPosition = state_1.advanceDot(stateToAdvance);
                 var newStateRuleStart = stateToAdvance.ruleStartPosition;
-                addForwardScores.add(newStateRule, position, newStateRuleStart, newStateDotPosition, fw);
+                if (newStateRule.left === "S"
+                    && newStateRule.right.length === 2
+                    && position === 3
+                    && newStateRuleStart === 0
+                    && newStateDotPosition === 1) {
+                    console.log("S03S1: +" + fw.resolve());
+                }
+                addForwardScores.plus(newStateRule, position, newStateRuleStart, newStateDotPosition, fw);
                 if (state_1.isPassive(newStateRule, newStateDotPosition)
                     && !rule_1.isUnitProduction(newStateRule)
                     && !stateSets.has(newStateRule, position, newStateRuleStart, newStateDotPosition)) {
                     if (!possiblyNewStates)
                         possiblyNewStates = new addable_expressions_container_1.DeferredStateScoreComputations(sr);
-                    possiblyNewStates.add(newStateRule, position, newStateRuleStart, newStateDotPosition, fw);
+                    possiblyNewStates.plus(newStateRule, position, newStateRuleStart, newStateDotPosition, fw);
                 }
-                addInnerScores.add(newStateRule, position, newStateRuleStart, newStateDotPosition, inner);
+                addInnerScores.plus(newStateRule, position, newStateRuleStart, newStateDotPosition, inner);
             });
         });
         if (!!possiblyNewStates) {
             var newCompletedStates_1 = new Set();
             possiblyNewStates.forEach(function (index, ruleStart, dot, rule, score) {
+                if (stateSets.has(rule, index, ruleStart, dot)) {
+                    throw new Error("State wasn't new");
+                }
                 var state = stateSets.getOrCreate(index, ruleStart, dot, rule);
                 if (!state_1.isCompleted(state) || rule_1.isUnitProduction(state.rule))
-                    throw new Error("Unexpected state found in possible new states. This is a bug.");
+                    throw new Error("Unexpected chart found in possible new states. This is a bug.");
                 newCompletedStates_1.add(state);
             });
             if (newCompletedStates_1 != null && newCompletedStates_1.size > 0) {
@@ -61,7 +71,7 @@
     function complete(i, stateSets, grammar) {
         var addForwardScores = new addable_expressions_container_1.DeferredStateScoreComputations(grammar.deferrableSemiring);
         var addInnerScores = new addable_expressions_container_1.DeferredStateScoreComputations(grammar.deferrableSemiring);
-        var completeOnStates = stateSets.completedStatesThatAreNotUnitProductions.get(i);
+        var completeOnStates = stateSets.getCompletedStatesThatAreNotUnitProductions(i);
         if (!!completeOnStates)
             completeNoViterbi(i, completeOnStates, addForwardScores, addInnerScores, grammar, stateSets);
         addForwardScores.forEach(function (position, ruleStart, dot, rule, score) {
