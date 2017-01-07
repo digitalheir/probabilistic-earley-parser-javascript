@@ -27,6 +27,7 @@ rewritten in any normal form.
 ## Usage
 ````javascript
 import {getViterbiParse, Grammar} from 'probabilistic-earley-parser';
+import treeify from 'treeify';
 
 // Nonterminals are string
 const S = "S"; // : NonTerminal 
