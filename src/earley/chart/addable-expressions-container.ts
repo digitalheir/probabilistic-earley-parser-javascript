@@ -73,30 +73,8 @@ export class DeferredStateScoreComputations<SemiringType,TokenType> {
             rule, index, ruleStart, dotPosition,
             this.ZERO
         );
-        const newValue: Expression<SemiringType> = this.semiring.plus(addValue, current.expression);
-
-        if (print && rule.left === "S"
-            && rule.right.length === 2
-            && index === 3
-            && ruleStart === 0
-            && dotPosition === 2) {
-            let newVar = this.get(rule, index, ruleStart, dotPosition);
-            console.log(" | S03S2:  " + " (" + Math.exp(-(newVar ? newVar.resolve() : Infinity)) + ")");
-            console.log(" | S03S2: +" + " (" + Math.exp(-addValue.resolve()) + ")");
-            console.log(" | S03S2: =" + " (" + Math.exp(-newValue.resolve()) + ")");
-            // console.log(completedState);
-        }
-        current.expression = newValue;
+        current.expression = this.semiring.plus(addValue, current.expression);
         this.states.put(rule, index, ruleStart, dotPosition, current);
-        if (print && rule.left === "S"
-            && rule.right.length === 2
-            && index === 3
-            && ruleStart === 0
-            && dotPosition === 2) {
-            let newVar = this.get(rule, index, ruleStart, dotPosition);
-            console.log(" | S03S2:  " + " (" + Math.exp(-(newVar ? newVar.resolve() : Infinity)) + ")");
-            // console.log(completedState);
-        }
     }
 
     forEach(f: (index: number, ruleStart: number, dot: number, rule: Rule<TokenType>, score: Expression<SemiringType>) => any) {

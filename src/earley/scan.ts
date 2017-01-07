@@ -33,8 +33,6 @@ export function scan<S, T>(tokenPosition: number,
         const activeCategory = getActiveCategory(preScanState);
         if (isNonTerminal(activeCategory)) throw new Error("this is a bug");
         else {
-            console.log(activeCategory.toString());
-            console.log(token);
             if (activeCategory(token)) { // TODO can this be more efficient, ie have tokens make their category be explicit? (Do we want to maintain the possibility of such "fluid" categories?)
                 // Create the chart <code>i+1: X<sub>k</sub> → λt·μ</code>
                 const preScanForward: S = stateSets.getForwardScore(preScanState);

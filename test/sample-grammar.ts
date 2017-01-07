@@ -11,7 +11,7 @@ export const Z:NonTerminal = "Z";
 export const e:Terminal<string> = (s) => s === "e";
 export const a = (t:string) =>!!t.match(/a/i);
 
-export const builder = Grammar.builder("test");
+const builder = Grammar.builder("test");
 export const g:Grammar<string, number>  = builder
     .addNewRule(1.0, A, [B, C, D, E])
     .addNewRule(1.0, A, [e])

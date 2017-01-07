@@ -89,8 +89,50 @@ const viterbi = getViterbiParse(
     grammar,
     tokens
 ); // : ParseTreeWithScore<string>
-console.log(JSON.stringify(viterbi.parseTree)); // {"category":"<start>","children":[{"category":"S","children":[{"category":"NP","children":[{"category":"Det","children":[{"token":"The","children":[    ]}]},{"category":"N","children":[{"token":"man","children":[]}]}]},{"category":"VP","children":[{"category":"TV","children":[{"token":"chased","children":[]}]},{"category":"NP","children":[{"category":"Det","children":[{"token":"the","children":[]}]},{"category":"N","children":[{"token":"man","c        hildren":[]}]},{"category":"Mod","children":[{"token":"with","children":[]},{"category":"NP","children":[{"category":"Det","children":[{"token":"a",        "children":[]}]},{"category":"N","children":[{"token":"stick","children":[]}]}]}]}]}]}]}]}
+
 console.log(viterbi.probability); // 0.6
+
+function makeTree(o){
+    if(o.children && o.children.length > 0){
+        const obj = {
+        };
+        for(var i=0;i<o.children.length;i++){
+            const name = o.children[i].token?o.children[i].token:o.children[i].category;
+            obj[name] = makeTree(o.children[i]);
+        }
+        return obj;
+    }else if(o.token) return o.token;
+    else return o.category;
+}
+
+/*
+0.6
+└─ S
+   ├─ NP
+   │  ├─ Det
+   │  │  └─ The
+   │  └─ N
+   │     └─ man
+   └─ VP
+      ├─ TV
+      │  └─ chased
+      └─ NP
+         ├─ Det
+         │  └─ the
+         ├─ N
+         │  └─ man
+         └─ Mod
+            ├─ with
+            └─ NP
+               ├─ Det
+               │  └─ a
+               └─ N
+                  └─ stick
+*/
+
+
+console.log(treeify.asTree(makeTree(viterbi.parseTree)));
+
 ````
 
 ## Some notes on implementation

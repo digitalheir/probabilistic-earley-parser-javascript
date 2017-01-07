@@ -6,7 +6,6 @@ import {Rule, isUnitProduction} from "../grammar/rule";
 import {Expression} from "semiring/abstract-expression/expression";
 import {DeferredStateScoreComputations} from "./chart/addable-expressions-container";
 import {Atom} from "semiring/abstract-expression/atom";
-import {S2SS} from "../../test/sample-grammar";
 import {DeferredValue} from "./expression/value";
 /**
  * Completes states exhaustively and makes resolvable expressions for the forward and inner scores.
@@ -39,14 +38,7 @@ function completeNoViterbi<S,T>(position: number,
         const Y: NonTerminal = completedState.rule.left;
         const probM = grammar.probabilityMapping;
 
-        let newVar = addInnerScores.get(
-            S2SS,
-            3,
-            0,
-            2
-        );
-        console.log("nao: "+ " ("
-            + Math.exp(-(newVar?newVar.resolve():Infinity)) + ")");
+
 
         const innerScore: S = stateSets.getInnerScore(completedState);
         // TODO pre-create atom?
@@ -54,15 +46,6 @@ function completeNoViterbi<S,T>(position: number,
             completedState,
             new Atom(innerScore)
         );
-
-        let newVar2 = addInnerScores.get(
-            S2SS,
-            3,
-            0,
-            2
-        );
-        console.log("nao2: "+ " ("
-            + Math.exp(-(newVar2?newVar2.resolve():Infinity)) + ")");
 
 
         //TODO investigate error, probably somwhere inners arent added well
@@ -137,16 +120,6 @@ function completeNoViterbi<S,T>(position: number,
                 newStateDotPosition,
                 inner,true
             );
-            if (newStateRule.left === "S"
-                && newStateRule.right.length === 2
-                && position=== 3
-                && newStateRuleStart === 0
-                && newStateDotPosition === 1) {
-                // console.log(" - S03S1:  " + " (" + Math.exp(-()) + ")");
-                // console.log(" - S03S1: +" + " (" + Math.exp(-inner.resolve()) + ")");
-                console.log(" - S03S1: =" + " (" + Math.exp(-unresolvedCompletedInner.expression.resolve()) + ")");
-                // console.log(completedState);
-            }
         });
     });
 

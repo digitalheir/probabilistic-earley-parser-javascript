@@ -1,1 +1,0 @@
-{"version":3,"file":"parsetree.js","sourceRoot":"","sources":["../../src/earley/parsetree.ts"],"names":[],"mappings":";;;;;;;;;IA0BA,yBAAmC,QAAqB,EAAE,QAA6B;QAA7B,yBAAA,EAAA,aAA6B;QACnF,MAAM,CAAC,EAAC,QAAQ,UAAA,EAAE,QAAQ,UAAA,EAAC,CAAC;IAChC,CAAC;IAFD,0CAEC;IAED,sBAAgC,KAAmB,EAAE,KAAmB;QACpE,KAAK,CAAC,QAAQ,CAAC,IAAI,CAAC,KAAK,CAAC,CAAC;IAC/B,CAAC;IAFD,oCAEC"}

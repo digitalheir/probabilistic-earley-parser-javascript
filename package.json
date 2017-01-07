@@ -14,11 +14,11 @@
     "test:earley": "mocha -r ts-node/register test/**/earley.spec.ts"
   },
   "dependencies": {
-    "@types/core-js": "0.9.35",
     "core-js": "2.4.1",
     "semiring": "1.1.2"
   },
   "devDependencies": {
+    "@types/core-js": "0.9.35",
     "@types/chai": "^3.4.34",
     "@types/mocha": "^2.2.34",
     "chai": "^3.5.0",
