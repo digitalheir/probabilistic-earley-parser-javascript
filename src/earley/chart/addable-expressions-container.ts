@@ -27,12 +27,7 @@ export class DeferredStateScoreComputations<SemiringType,TokenType> {
         return this.states.get(rule, index, ruleStart, dot).expression;
     }
 
-
-    getOrCreateByState(state: State<SemiringType,TokenType>, defaultValue: Expression<SemiringType>): Expression<SemiringType> {
-        return this._getOrCreateByState(state, defaultValue).expression;
-    }
-
-    _getOrCreateByState(state: State<SemiringType,TokenType>,
+    getOrCreateByState(state: State<SemiringType,TokenType>,
                         defaultValue: Expression<SemiringType>): DeferredValue<SemiringType> {
         if (this.states.hasByState(state)) {
             return this.states.getByState(state);
@@ -44,14 +39,6 @@ export class DeferredStateScoreComputations<SemiringType,TokenType> {
     }
 
     getOrCreate(rule: Rule<TokenType>,
-                index: number,
-                ruleStart: number,
-                dotPosition: number,
-                defaultValue: Expression<SemiringType>): Expression<SemiringType> {
-        return this._getOrCreate(rule, index, ruleStart, dotPosition, defaultValue).expression;
-    }
-
-    private _getOrCreate(rule: Rule<TokenType>,
                          index: number,
                          ruleStart: number,
                          dotPosition: number,
@@ -82,7 +69,7 @@ export class DeferredStateScoreComputations<SemiringType,TokenType> {
          ruleStart: number,
          dotPosition: number,
          addValue: Expression<SemiringType>, print?: boolean): void {
-        const current: DeferredValue<SemiringType> = this._getOrCreate(
+        const current: DeferredValue<SemiringType> = this.getOrCreate(
             rule, index, ruleStart, dotPosition,
             this.ZERO
         );
@@ -101,6 +88,15 @@ export class DeferredStateScoreComputations<SemiringType,TokenType> {
         }
         current.expression = newValue;
         this.states.put(rule, index, ruleStart, dotPosition, current);
+        if (print && rule.left === "S"
+            && rule.right.length === 2
+            && index === 3
+            && ruleStart === 0
+            && dotPosition === 2) {
+            let newVar = this.get(rule, index, ruleStart, dotPosition);
+            console.log(" | S03S2:  " + " (" + Math.exp(-(newVar ? newVar.resolve() : Infinity)) + ")");
+            // console.log(completedState);
+        }
     }
 
     forEach(f: (index: number, ruleStart: number, dot: number, rule: Rule<TokenType>, score: Expression<SemiringType>) => any) {

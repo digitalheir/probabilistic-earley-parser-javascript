@@ -7,6 +7,7 @@ import {Expression} from "semiring/abstract-expression/expression";
 import {DeferredStateScoreComputations} from "./chart/addable-expressions-container";
 import {Atom} from "semiring/abstract-expression/atom";
 import {S2SS} from "../../test/sample-grammar";
+import {DeferredValue} from "./expression/value";
 /**
  * Completes states exhaustively and makes resolvable expressions for the forward and inner scores.
  * Note that these expressions can only be resolved to actual values after finishing completion, because they may depend on one another.
@@ -49,7 +50,7 @@ function completeNoViterbi<S,T>(position: number,
 
         const innerScore: S = stateSets.getInnerScore(completedState);
         // TODO pre-create atom?
-        const unresolvedCompletedInner: Expression<S> = addInnerScores.getOrCreateByState(
+        const unresolvedCompletedInner: DeferredValue<S> = addInnerScores.getOrCreateByState(
             completedState,
             new Atom(innerScore)
         );
@@ -71,12 +72,12 @@ function completeNoViterbi<S,T>(position: number,
             // Make i: X_k → lZ·m
             const innerScore2 = stateSets.getInnerScore(stateToAdvance);
             // TODO pre-create atom?
-            const prevInner: Expression<S> = addInnerScores.getOrCreateByState(stateToAdvance,
+            const prevInner: DeferredValue<S> = addInnerScores.getOrCreateByState(stateToAdvance,
                 new Atom(innerScore2)
             );
             const forwardScore = stateSets.getForwardScore(stateToAdvance);
             // TODO pre-create atom?
-            const prevForward: Expression<S> = addForwardScores.getOrCreateByState(stateToAdvance,
+            const prevForward: DeferredValue<S> = addForwardScores.getOrCreateByState(stateToAdvance,
                 new Atom(forwardScore)
             );
 
@@ -136,6 +137,16 @@ function completeNoViterbi<S,T>(position: number,
                 newStateDotPosition,
                 inner,true
             );
+            if (newStateRule.left === "S"
+                && newStateRule.right.length === 2
+                && position=== 3
+                && newStateRuleStart === 0
+                && newStateDotPosition === 1) {
+                // console.log(" - S03S1:  " + " (" + Math.exp(-()) + ")");
+                // console.log(" - S03S1: +" + " (" + Math.exp(-inner.resolve()) + ")");
+                console.log(" - S03S1: =" + " (" + Math.exp(-unresolvedCompletedInner.expression.resolve()) + ")");
+                // console.log(completedState);
+            }
         });
     });
 
