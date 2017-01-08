@@ -5,7 +5,7 @@
 
 # Probabilistic Earley parser
 
-This is a library for parsing a string of tokens into parse tree that are weighted by probability. For example: you might want to know the probabilities for all derivations of an English sentence, or the most likely table of contents structure for a list of paragraphs. This library allows you to do so efficiently, as long as you can describe the rules as a [Context-free Grammar](https://en.wikipedia.org/wiki/Context-free_grammar) (CFG).
+This is a library for parsing a string of tokens (like words) into parse trees (like linguistic derivations) that are weighted by probability. For example: you might want to know the probabilities for all derivations of an English sentence, or the most likely table of contents structure for a list of paragraphs. This library allows you to do so efficiently, as long as you can describe the rules as a [Context-free Grammar](https://en.wikipedia.org/wiki/Context-free_grammar) (CFG).
 
 The innovation of this library with respect to the gazillion other parsing libraries is that this one allows derivation rules to have a probability attached to them. The primary feature that this unlocks is to select from an ambiguous sentence the most likely derivation. This is possible because the derivations are weighted by probability. If you do not need probabilities, you are probably better off using [nearley](http://nearley.js.org).
 
