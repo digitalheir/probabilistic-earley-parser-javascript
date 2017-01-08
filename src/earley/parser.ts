@@ -88,10 +88,10 @@ export function getViterbiParseFromChart<S, T>(state: State<S, T>, chart: Chart<
 }
 
 
-
 export function parseSentenceIntoChart<S, T>(Start: NonTerminal,
                                              grammar: Grammar<T, S>,
-                                             tokens: T[]): [Chart<T, S>, number, State<S, T>] {
+                                             tokens: T[],
+                                             scanProbability?: (x: T, t: Terminal<T>[]) => S): [Chart<T, S>, number, State<S, T>] {
     // ScanProbability scanProbability//TODO
 
     const stateSets: Chart<T, S> = new Chart(grammar);
@@ -125,7 +125,7 @@ export function parseSentenceIntoChart<S, T>(Start: NonTerminal,
     tokensWithWords.forEach(
         (token: WordWithTypes<T>) => {
             predict(i, grammar, stateSets);
-            scan(i, token, grammar.probabilityMapping.semiring, stateSets);
+            scan(i, token, grammar.probabilityMapping.semiring, stateSets, scanProbability);
             complete(i + 1, stateSets, grammar);
 
             const completedStates: State<S, T>[] = [];
@@ -153,8 +153,13 @@ export interface ParseTreeWithScore<T> {
 
 export function getViterbiParse<S, T>(Start: NonTerminal,
                                       grammar: Grammar<T, S>,
-                                      tokens: T[]): ParseTreeWithScore<T> {
-    const [chart, ignored, init] = parseSentenceIntoChart(Start, grammar, tokens);
+                                      tokens: T[],
+                                      scanProbability?: (x: T, t: Terminal<T>[]) => S): ParseTreeWithScore<T> {
+    const [chart, ignored, init] = parseSentenceIntoChart(Start, grammar, tokens, scanProbability);
+
+    if (!chart.has(init.rule, tokens.length,
+            0,
+            init.rule.right.length)) throw new Error("Could not parse sentence.");
 
     const finalState = chart.getOrCreate(
         tokens.length,
@@ -162,6 +167,7 @@ export function getViterbiParse<S, T>(Start: NonTerminal,
         init.rule.right.length,
         init.rule
     );
+
 
     const parseTree: ParseTree<T> = getViterbiParseFromChart(finalState, chart);
     const toProbability = grammar.probabilityMapping.toProbability;

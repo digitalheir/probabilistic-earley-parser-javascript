@@ -1,4 +1,4 @@
-import {isNonTerminal, WordWithTypes} from "../grammar/category";
+import {isNonTerminal, WordWithTypes, Terminal} from "../grammar/category";
 import {Semiring} from "semiring";
 import {Chart} from "./chart/chart";
 import {getActiveCategory, State, advanceDot} from "./chart/state";
@@ -10,19 +10,18 @@ import {getActiveCategory, State, advanceDot} from "./chart/state";
  * @param tokenPosition   The start index of the scan.
  * @param word
  * @param types
- * //@param scanProbability Function that provides the probability of scanning the given token at this position. Might be null for a probability of 1.0.
+ * @param scanProbability Function that provides the probability of scanning the given token at this position. Might be null for a probability of 1.0.
  * @param sr
  * @param stateSets
  */
 export function scan<S, T>(tokenPosition: number,
     {word, types}: WordWithTypes<T>,
-                           // scanProbability:(x:T)=>number,//TODO
                            sr: Semiring<S>,
-                           stateSets: Chart<T, S>) {
+                           stateSets: Chart<T, S>,
+                           scanProbability?: (x: T, t: Terminal<T>[]) => S) {
     const changes: any[] = [];
-    // TODO
-    // const scanProb:number = !scanProbability ? NaN : scanProbability(tokenPosition);
-    const scanProb: S = sr.multiplicativeIdentity;
+
+    const scanProb: S = !!scanProbability ? scanProbability(word, types) : undefined;
 
     /*
      * Get all states that are active on a terminal

@@ -1,19 +1,15 @@
-import {NonTerminal, Terminal, Category} from "../../src/grammar/category";
+import {NonTerminal, Terminal} from "../../src/grammar/category";
 import {getViterbiParse, ParseTreeWithScore, Grammar} from "../../src/index";
 
-import * as Mocha from 'mocha'
-import {expect} from 'chai';
-import {scan} from "../../src/earley/scan";
-import {LogSemiring} from "semiring";
-import {Chart} from "../../src/earley/chart/chart";
+import {expect} from "chai";
 import {g, A} from "../sample-grammar";
 import {parseSentenceIntoChart} from "../../src/earley/parser";
 
-//TODO
-describe('parser', () => {
+// TODO
+describe("parser", () => {
 
 
-    it('should complete correctly', () => {
+    it("should complete correctly", () => {
         // complete(
         //     0,
         //     "e",
@@ -21,7 +17,7 @@ describe('parser', () => {
         //     ss
         // )
     });
-    it('should predict correctly', () => {
+    it("should predict correctly", () => {
         // complete(
         //     0,
         //     "e",
@@ -29,7 +25,7 @@ describe('parser', () => {
         //     ss
         // )
     });
-    it('should parse the man chase the man with a stick', () => {
+    it("should parse the man chase the man with a stick", () => {
         const S: NonTerminal = "S";
         const NP: NonTerminal = "NP";
         const VP: NonTerminal = "VP";
@@ -47,8 +43,8 @@ describe('parser', () => {
         const stick: Terminal<string> = (token) => !!token.match(/stick/);
         const with_: Terminal<string> = (token) => !!token.match(/with/);
 
-        const grammar: Grammar<string,number> = Grammar.builder("test")
-        //.setSemiring(new LogSemiring()) // If not set, defaults to Log semiring which is probably what you want
+        const grammar: Grammar<string, number> = Grammar.builder("test")
+        // .setSemiring(new LogSemiring()) // If not set, defaults to Log semiring which is probably what you want
             .addNewRule(
                 1.0,   // Probability between 0.0 and 1.0, defaults to 1.0. The builder takes care of converting it to the semiring element
                 S,     // Left hand side of the rule
@@ -88,18 +84,45 @@ describe('parser', () => {
             grammar,
             tokens
         );
-        //console.log(JSON.stringify(viterbi.parseTree)); // {"category":"<start>","children":[{"category":"S","children":[{"category":"NP","children":[{"category":"Det","children":[{"token":"The","children":[    ]}]},{"category":"N","children":[{"token":"man","children":[]}]}]},{"category":"VP","children":[{"category":"TV","children":[{"token":"chased","children":[]}]},{"category":"NP","children":[{"category":"Det","children":[{"token":"the","children":[]}]},{"category":"N","children":[{"token":"man","c        hildren":[]}]},{"category":"Mod","children":[{"token":"with","children":[]},{"category":"NP","children":[{"category":"Det","children":[{"token":"a",        "children":[]}]},{"category":"N","children":[{"token":"stick","children":[]}]}]}]}]}]}]}]}
-        //console.log(viterbi.probability); // 0.6
-        //Parser.recognize(S, grammar, Tokens.tokenize("the", "stick", "chased", "the", "man"))
+        // console.log(JSON.stringify(viterbi.parseTree)); // {"category":"<start>","children":[{"category":"S","children":[{"category":"NP","children":[{"category":"Det","children":[{"token":"The","children":[    ]}]},{"category":"N","children":[{"token":"man","children":[]}]}]},{"category":"VP","children":[{"category":"TV","children":[{"token":"chased","children":[]}]},{"category":"NP","children":[{"category":"Det","children":[{"token":"the","children":[]}]},{"category":"N","children":[{"token":"man","c        hildren":[]}]},{"category":"Mod","children":[{"token":"with","children":[]},{"category":"NP","children":[{"category":"Det","children":[{"token":"a",        "children":[]}]},{"category":"N","children":[{"token":"stick","children":[]}]}]}]}]}]}]}]}
+        // console.log(viterbi.probability); // 0.6
+        // Parser.recognize(S, grammar, Tokens.tokenize("the", "stick", "chased", "the", "man"))
     });
 
 
-it('should parse aaaaa', () => {
-        const tokens = ["a", "a", "a", "e"];
-        const [chart, i, init] = parseSentenceIntoChart(
+    const tokens = ["a", "a", "a", "e"];
+    it("should deal with scan probability correctly", () => {
+        const p1 = getViterbiParse(
             A,
             g,
-            tokens
+            tokens,
+            (ignore, ignored) => {
+                return g.probabilityMapping.fromProbability(1.0);
+            }
+        ).probability;
+
+        const p2 = getViterbiParse(
+            A,
+            g,
+            tokens,
+            (word, ignored) => {
+                return word === "a" ? g.probabilityMapping.fromProbability(0.5) : undefined;
+            }
+        ).probability;
+
+        const eq = p2 * 2 * 2 * 2;
+        const epsilon = 0.0000000000000001;
+        expect(p1).to.be.above(eq - epsilon).and.below(eq + epsilon);
+    });
+
+    it("should parse aaae", () => {
+        const [chart, ignored, init] = parseSentenceIntoChart(
+            A,
+            g,
+            tokens,
+            (word, terminalTypes) => {
+                return g.probabilityMapping.fromProbability(1.0);
+            }
         );
 
         expect(chart.getCompletedStates(tokens.length).has(
@@ -108,9 +131,5 @@ it('should parse aaaaa', () => {
             )
         )).to.equal(true);
 
-        /*console.log(g.probabilityMapping.toProbability(
-            chart.viterbiScores.get(chart.getOrCreate(
-                tokens.length, 0, init.rule.right.length, init.rule
-            )).innerScore));*/
     });
 });

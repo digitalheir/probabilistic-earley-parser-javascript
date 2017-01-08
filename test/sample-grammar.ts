@@ -20,7 +20,7 @@ export const g:Grammar<string, number>  = builder
     .addNewRule(0.5, C, [D])
     .addNewRule(0.5, D, [E])
     .addNewRule(0.5, D, [a])
-    .addNewRule(0.5, E, [E,E])
+    .addNewRule(0.5, E, [E, E])
     .addNewRule(0.5, E, [e])
     //.addRule(0.1, E, [C])
     .build();
