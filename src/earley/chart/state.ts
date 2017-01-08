@@ -1,4 +1,4 @@
-import {Rule, getActiveCategory as getActiveCategoryFromRule, invalidDotPosition} from '../../grammar/rule'
+import {Rule, getActiveCategory as getActiveCategoryFromRule, invalidDotPosition} from "../../grammar/rule";
 import {Category} from "../../grammar/category";
 
 /**
@@ -38,6 +38,8 @@ export interface State<SemiringType, TokenType> {
     scannedToken?: TokenType;
     scannedCategory?: Category<TokenType>;
 }
+
+//noinspection JSUnusedGlobalSymbols
 export interface StateWithScore<SemiringType, TokenType> {
     forwardScore: SemiringType;
     innerScore: SemiringType;
@@ -46,18 +48,18 @@ export interface StateWithScore<SemiringType, TokenType> {
 }
 
 
-export function isCompleted<T,E>(state: State<T,E>): boolean {
+export function isCompleted<T, E>(state: State<T, E>): boolean {
     return isPassive(state.rule, state.ruleDotPosition);
 }
 
-export function isActive<T,E>(state: State<T,E>): boolean {
+export function isActive<T, E>(state: State<T, E>): boolean {
     return !isCompleted(state);
 }
 
 /**
  * @return Active category for this chart. May be null.
  */
-export function getActiveCategory<Semi,Token>(state: State<Semi, Token>): Category<Token> {
+export function getActiveCategory<Semi, Token>(state: State<Semi, Token>): Category<Token> {
     return getActiveCategoryFromRule(state.rule, state.ruleDotPosition);
 }
 

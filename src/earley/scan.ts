@@ -1,5 +1,5 @@
 import {isNonTerminal} from "../grammar/category";
-import {Semiring} from "semiring/semiring";
+import {Semiring} from "semiring";
 import {Chart} from "./chart/chart";
 import {getActiveCategory, State, advanceDot} from "./chart/state";
 
@@ -15,12 +15,12 @@ import {getActiveCategory, State, advanceDot} from "./chart/state";
  */
 export function scan<S, T>(tokenPosition: number,
                            token: T,
-                           //scanProbability:(x:T)=>number,//TODO
+                           // scanProbability:(x:T)=>number,//TODO
                            sr: Semiring<S>,
                            stateSets: Chart<T, S>) {
-    const changes:any[] = [];
+    const changes: any[] = [];
     // TODO
-    //const scanProb:number = !scanProbability ? NaN : scanProbability(tokenPosition);
+    // const scanProb:number = !scanProbability ? NaN : scanProbability(tokenPosition);
     const scanProb: S = sr.multiplicativeIdentity;
 
     /*
@@ -29,7 +29,7 @@ export function scan<S, T>(tokenPosition: number,
      */
 
     const statesActiveOnTerminals: Set<State<S, T>> = stateSets.getStatesActiveOnTerminals(tokenPosition);
-    if (statesActiveOnTerminals) statesActiveOnTerminals.forEach((preScanState: State<S,T>) => {
+    if (statesActiveOnTerminals) statesActiveOnTerminals.forEach((preScanState: State<S, T>) => {
         const activeCategory = getActiveCategory(preScanState);
         if (isNonTerminal(activeCategory)) throw new Error("this is a bug");
         else {
@@ -38,7 +38,7 @@ export function scan<S, T>(tokenPosition: number,
                 const preScanForward: S = stateSets.getForwardScore(preScanState);
                 const preScanInner: S = stateSets.getInnerScore(preScanState);
                 // Note that this chart is unique for each preScanState
-                const postScanState: State<S,T> = stateSets.getOrCreate(
+                const postScanState: State<S, T> = stateSets.getOrCreate(
                     tokenPosition + 1, preScanState.ruleStartPosition,
                     advanceDot(preScanState),
                     preScanState.rule,
@@ -62,7 +62,7 @@ export function scan<S, T>(tokenPosition: number,
                 );
 
                 // Set Viterbi score
-                let viterbiScore = {
+                const viterbiScore = {
                     origin: preScanState,
                     resultingState: postScanState,
                     innerScore: postScanInner
@@ -89,8 +89,8 @@ export function scan<S, T>(tokenPosition: number,
  * @param previousInner   The previous inner score
  * @return The inner score for the new chart
  */
-function calculateInnerScore<S>(sr: Semiring<S>, previousInner: S, scanProbability?: S,): S {
-    if (scanProbability === undefined || scanProbability === null)
+function calculateInnerScore<S>(sr: Semiring<S>, previousInner: S, scanProbability?: S): S {
+    if (!scanProbability)
         return previousInner;
     else
         return sr.times(previousInner, scanProbability);
@@ -105,7 +105,7 @@ function calculateInnerScore<S>(sr: Semiring<S>, previousInner: S, scanProbabili
  * @return Computed forward score for the new chart
  */
 function calculateForwardScore<S>(sr: Semiring<S>, previousStateForwardScore: S, scanProbability?: S): S {
-    if (scanProbability === undefined || scanProbability === null)
+    if (!scanProbability)
         return previousStateForwardScore;
     else
         return sr.times(previousStateForwardScore, scanProbability);

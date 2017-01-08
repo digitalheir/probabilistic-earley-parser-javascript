@@ -2,7 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "declaration": true,
-    "module": "umd",
+    "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "preserveConstEnums": true,

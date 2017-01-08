@@ -18,13 +18,13 @@ import {DeferredValue} from "./expression/value";
  * @param grammar
  * @param stateSets
  */
-function completeNoViterbi<S,T>(position: number,
-                                states: Set<State<S,T>>,
-                                addForwardScores: DeferredStateScoreComputations<S,T>,
-                                addInnerScores: DeferredStateScoreComputations<S,T>,
+function completeNoViterbi<S, T>(position: number,
+                                states: Set<State<S, T>>,
+                                addForwardScores: DeferredStateScoreComputations<S, T>,
+                                addInnerScores: DeferredStateScoreComputations<S, T>,
                                 grammar: Grammar<T, S>,
                                 stateSets: Chart<T, S>) {
-    let possiblyNewStates: DeferredStateScoreComputations<S,T>;
+    let definitelyNewStates: DeferredStateScoreComputations<S, T>;
 
     // For all states
     //      i: Y<sub>j</sub> → v·    [a",y"]
@@ -32,7 +32,7 @@ function completeNoViterbi<S,T>(position: number,
     //
     //  such that the R*(Z =*> Y) is nonzero
     //  and Y → v is not a unit production
-    states.forEach((completedState: State<S,T>) => {
+    states.forEach((completedState: State<S, T>) => {
         const j: number = completedState.ruleStartPosition;
         //noinspection JSSuspiciousNameCombination
         const Y: NonTerminal = completedState.rule.left;
@@ -48,9 +48,7 @@ function completeNoViterbi<S,T>(position: number,
         );
 
 
-        //TODO investigate error, probably somwhere inners arent added well
-
-        stateSets.getStatesActiveOnNonTerminalWithNonZeroUnitStarScoreToY(j, Y).forEach((stateToAdvance: State<S,T>) => {
+        stateSets.getStatesActiveOnNonTerminalWithNonZeroUnitStarScoreToY(j, Y).forEach((stateToAdvance: State<S, T>) => {
             if (j !== stateToAdvance.position) throw new Error("Index failed. This is a bug.");
             // Make i: X_k → lZ·m
             const innerScore2 = stateSets.getInnerScore(stateToAdvance);
@@ -100,11 +98,11 @@ function completeNoViterbi<S,T>(position: number,
             // If this is a new completed chart that is no unit production,
             // make a note of it it because we want to recursively call *complete* on these states
             if (
-                isPassive(newStateRule, newStateDotPosition)/*isCompleted*/
+                isPassive(newStateRule, newStateDotPosition)
                 && !isUnitProduction(newStateRule)
                 && !stateSets.has(newStateRule, position, newStateRuleStart, newStateDotPosition)) {
-                if (!possiblyNewStates) possiblyNewStates = new DeferredStateScoreComputations<S,T>(sr);
-                possiblyNewStates.plus(
+                if (!definitelyNewStates) definitelyNewStates = new DeferredStateScoreComputations<S, T>(sr);
+                definitelyNewStates.plus(
                     newStateRule,
                     position,
                     newStateRuleStart,
@@ -118,33 +116,32 @@ function completeNoViterbi<S,T>(position: number,
                 position,
                 newStateRuleStart,
                 newStateDotPosition,
-                inner,true
+                inner
             );
         });
     });
 
 
-    if (!!possiblyNewStates) {
-        const newCompletedStates: Set<State<S,T>> = new Set<State<S,T>>();
-        possiblyNewStates.forEach(
+    if (!!definitelyNewStates) {
+        const newCompletedStates: Set<State<S, T>> = new Set<State<S, T>>();
+        definitelyNewStates.forEach(
             (index: number,
              ruleStart: number,
              dot: number,
              rule: Rule<T>,
-             score: Expression<S>) => {
-                //const isNew: boolean = !stateSets.has(index, ruleStart, dot, rule);
-
+             ignored: Expression<S>) => {
+                // const isNew: boolean = !stateSets.has(index, ruleStart, dot, rule);
                 if (stateSets.has(rule, index, ruleStart, dot)) {
                     throw new Error("State wasn't new");
                 }
 
-                const state: State<S,T> = stateSets.getOrCreate(index, ruleStart, dot, rule);
+                const state: State<S, T> = stateSets.getOrCreate(index, ruleStart, dot, rule);
                 if (!isCompleted(state) || isUnitProduction(state.rule))
                     throw new Error("Unexpected chart found in possible new states. This is a bug.");
 
                 newCompletedStates.add(state);
             });
-        if (newCompletedStates != null && newCompletedStates.size > 0) {
+        if (!!newCompletedStates && newCompletedStates.size > 0) {
             completeNoViterbi(position,
                 newCompletedStates,
                 addForwardScores,
@@ -162,8 +159,8 @@ function completeNoViterbi<S,T>(position: number,
  * @param stateSets
  * @param grammar
  */
-export function complete<S,T>(i: number,
-                              stateSets: Chart<T,S>,
+export function complete<S, T>(i: number,
+                              stateSets: Chart<T, S>,
                               grammar: Grammar<T, S>) {
     const addForwardScores = new DeferredStateScoreComputations(grammar.deferrableSemiring);
     const addInnerScores = new DeferredStateScoreComputations(grammar.deferrableSemiring);
@@ -181,7 +178,7 @@ export function complete<S,T>(i: number,
 
     // Resolve and set forward score
     addForwardScores.forEach((position, ruleStart, dot, rule, score) => {
-        const state: State<S,T> = stateSets.getOrCreate(position, ruleStart, dot, rule);
+        const state: State<S, T> = stateSets.getOrCreate(position, ruleStart, dot, rule);
         // TODO dont getorcreate chart
         stateSets.setForwardScore(state, score.resolve());
     });
@@ -189,7 +186,7 @@ export function complete<S,T>(i: number,
     // Resolve and set inner score
     addInnerScores.forEach((position, ruleStart, dot, rule, score) => {
         // TODO dont getorcreate chart
-        const state: State<S,T> = stateSets.getOrCreate(position, ruleStart, dot, rule);
+        const state: State<S, T> = stateSets.getOrCreate(position, ruleStart, dot, rule);
         stateSets.setInnerScore(state, score.resolve());
     });
 }

@@ -2,8 +2,15 @@ import {Rule} from "../../grammar/rule";
 import {getOrCreateMap} from "../../util";
 import {State} from "./state";
 
-export class StateToObjectMap<T,O> {
-    private map: Map<Rule<T>,/*index*/Map<number,        /*rule start*/        Map<number,            /*dot position*/            Map<number,                O                >            >        >> = new Map<Rule<T>,/*index*/Map<number,/*rule start*/Map<number,/*dot position*/Map<number,O>>>>();
+export class StateToObjectMap<T, O> {
+    private map: Map<Rule<T>,
+        /* index */Map<number,
+        /*rule start*/Map<number,
+        /*dot position*/Map<number,
+        O>>>> = new Map<Rule<T>,
+        /*index*/Map<number,
+        /*rule start*/Map<number,
+        /*dot position*/Map<number, O>>>>();
     // private _size: number = 0;
 
     constructor() {
@@ -21,7 +28,7 @@ export class StateToObjectMap<T,O> {
         return getOrCreateMap(getOrCreateMap(getOrCreateMap(this.map, rule), position), ruleStartPosition).get(ruleDotPosition);
     }
 
-    putByState<S>(state: State<S,T>, value: O): void {
+    putByState<S>(state: State<S, T>, value: O): void {
         this.put(state.rule, state.position, state.ruleStartPosition, state.ruleDotPosition, value);
     }
 
@@ -32,15 +39,15 @@ export class StateToObjectMap<T,O> {
             return _default;
     }
 
-    getByStateOrDefault<S>(state: State<S,T>, _default: O): O {
+    getByStateOrDefault<S>(state: State<S, T>, _default: O): O {
         return this.getOrDefault(state.rule, state.position, state.ruleStartPosition, state.ruleDotPosition, _default);
     }
 
-    getByState<S>(state: State<S,T>): O {
+    getByState<S>(state: State<S, T>): O {
         return this.get(state.rule, state.position, state.ruleStartPosition, state.ruleDotPosition);
     }
 
-    hasByState<S>(state: State<S,T>): boolean {
+    hasByState<S>(state: State<S, T>): boolean {
         return this.has(state.rule, state.position, state.ruleStartPosition, state.ruleDotPosition);
     }
 
@@ -53,9 +60,9 @@ export class StateToObjectMap<T,O> {
                             (val3, start) => {
                                 val3.forEach(
                                     (object: O, dot: number) => f(position, start, dot, rule, object)
-                                )
-                            })
-                    })
+                                );
+                            });
+                    });
             });
     }
 

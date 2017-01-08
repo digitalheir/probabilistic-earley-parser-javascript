@@ -2,7 +2,7 @@ import {NonTerminal, Category, isNonTerminal} from "./category";
 import {Rule, isUnitProduction} from "./rule";
 import {getOrCreateMap, getOrCreateSet} from "../util";
 //noinspection ES6UnusedImports
-import {Set, Map} from 'core-js'
+import {Set, Map} from "core-js";
 
 /**
  * Returns the inverse of matrix `M`.
@@ -17,21 +17,21 @@ import {Set, Map} from 'core-js'
  * (c) Add 2 rows
  */
 function invert(M: number[][]) {
-    //if the matrix isn't square
+    // if the matrix isn't square
     if (M.length !== M[0].length) throw new Error("Matrix must be square");
 
-    //create the identity matrix (I), and a copy (C) of the original
+    // create the identity matrix (I), and a copy (C) of the original
 
     const dim = M.length;
     const I: number[][] = [];
-    let C: number[][] = [];
+    const C: number[][] = [];
     for (let i = 0; i < dim; i += 1) {
         // Create the row
         I[I.length] = [];
         C[C.length] = [];
         for (let j = 0; j < dim; j += 1) {
 
-            //if we're on the diagonal, put a 1 (for identity)
+            // if we're on the diagonal, put a 1 (for identity)
             if (i == j) {
                 I[i][j] = 1;
             }
@@ -51,34 +51,34 @@ function invert(M: number[][]) {
 
         // if we have a 0 on the diagonal (we'll need to swap with a lower row)
         if (e === 0) {
-            //look through every row below the i'th row
+            // look through every row below the i'th row
             for (let ii = i + 1; ii < dim; ii += 1) {
-                //if the ii'th row has a non-0 in the i'th col
+                // if the ii'th row has a non-0 in the i'th col
                 if (C[ii][i] !== 0) {
-                    //it would make the diagonal have a non-0 so swap it
+                    // it would make the diagonal have a non-0 so swap it
                     for (let j = 0; j < dim; j++) {
-                        e = C[i][j];       //temp store i'th row
-                        C[i][j] = C[ii][j];//replace i'th row by ii'th
-                        C[ii][j] = e;      //repace ii'th by temp
-                        e = I[i][j];       //temp store i'th row
-                        I[i][j] = I[ii][j];//replace i'th row by ii'th
-                        I[ii][j] = e;      //repace ii'th by temp
+                        e = C[i][j];       // temp store i'th row
+                        C[i][j] = C[ii][j]; // replace i'th row by ii'th
+                        C[ii][j] = e;      // repace ii'th by temp
+                        e = I[i][j];       // temp store i'th row
+                        I[i][j] = I[ii][j]; // replace i'th row by ii'th
+                        I[ii][j] = e;      // repace ii'th by temp
                     }
-                    //don't bother checking other rows since we've swapped
+                    // don't bother checking other rows since we've swapped
                     break;
                 }
             }
-            //get the new diagonal
+            // get the new diagonal
             e = C[i][i];
-            //if it's still 0, not invertable (error)
+            // if it's still 0, not invertable (error)
             if (e == 0)
                 throw new Error("Matrix was not invertable");
         }
 
         // Scale this row down by e (so we have a 1 on the diagonal)
         for (let j = 0; j < dim; j++) {
-            C[i][j] = C[i][j] / e; //apply to original matrix
-            I[i][j] = I[i][j] / e; //apply to identity
+            C[i][j] = C[i][j] / e; // apply to original matrix
+            I[i][j] = I[i][j] / e; // apply to identity
         }
 
         // Subtract this row (scaled appropriately for each row) from ALL of
@@ -98,14 +98,14 @@ function invert(M: number[][]) {
             // stuff left of diagonal is 0 (which it should be if we made this
             // algorithm correctly)
             for (let j = 0; j < dim; j++) {
-                C[ii][j] -= e * C[i][j]; //apply to original matrix
-                I[ii][j] -= e * I[i][j]; //apply to identity
+                C[ii][j] -= e * C[i][j]; // apply to original matrix
+                I[ii][j] -= e * I[i][j]; // apply to identity
             }
         }
     }
 
-    //we've done all operations, C should be the identity
-    //matrix I should be the inverse:
+    // we've done all operations, C should be the identity
+    // matrix I should be the inverse:
     return I;
 }
 
@@ -135,7 +135,7 @@ export class LeftCorners<T> {
      * to {@link Category} with some utility functions to deal with probabilities.
      * @param ZERO Default value if there is no chance; usually 0
      */
-    constructor(ZERO: number = 0) {
+    constructor(ZERO = 0) {
         this.ZERO = ZERO;
 
         this.map = new Map<Category<T>, Map<Category<T>, number>>();
@@ -152,7 +152,7 @@ export class LeftCorners<T> {
      * @param probability number to plus
      */
     public add(x: Category<T>, y: Category<T>, probability: number) {
-        const newProbability = this.get(x, y)/*defaults to zero*/ + probability;
+        const newProbability = this.get(x, y) /* defaults to zero */ + probability;
         if (!isFinite(newProbability))
             throw new Error("Invalid left-[*]-corner probability: " + newProbability + " for " + x + " -L> " + y + " ... ");
         this.set(x, y, newProbability);
@@ -162,7 +162,7 @@ export class LeftCorners<T> {
      * @return stored value in left-corner relationship. this.ZERO by default
      */
     public get(x: Category<T>, y: Category<T>): number {
-        if(!this.map) throw new Error("Map was not defined");
+        if (!this.map) throw new Error("Map was not defined");
         const yToP = getOrCreateMap(this.map, x);
         if (!yToP) return this.ZERO;
         else return yToP.get(y) || this.ZERO;
@@ -208,7 +208,7 @@ export class LeftCorners<T> {
  */
 export function getReflexiveTransitiveClosure<T>(nonTerminals: Set<NonTerminal>,
                                                  P: LeftCorners<T>,
-                                                 zero: number = 0.0): LeftCorners<T> {
+                                                 zero = 0.0): LeftCorners<T> {
     const nonterminalz: NonTerminal[] = [];
     nonTerminals.forEach(a => nonterminalz.push(a));
 
@@ -240,12 +240,12 @@ export function getReflexiveTransitiveClosure<T>(nonTerminals: Set<NonTerminal>,
 
 export function getUnitStarCorners<T>(rules: Set<Rule<T>>,
                                       nonTerminals: Set<NonTerminal>,
-                                      zero: number = 0.0): LeftCorners<T> {
+                                      zero = 0.0): LeftCorners<T> {
     // Sum all probabilities for unit relations
     const P_U: LeftCorners<T> = new LeftCorners(zero);
     rules.forEach((rule: Rule<T>) => {
         if (isUnitProduction(rule))
-            P_U.add(rule.left, rule.right[0], rule.probability)
+            P_U.add(rule.left, rule.right[0], rule.probability);
     });
 
     // R_U = (I - P_U)
@@ -256,7 +256,7 @@ export function getUnitStarCorners<T>(rules: Set<Rule<T>>,
 /**
  * Compute left corner relations
  */
-export function getLeftCorners<T>(rules: Set<Rule<T>>, ZERO: number = 0.0): LeftCorners<T> {
+export function getLeftCorners<T>(rules: Set<Rule<T>>, ZERO = 0.0): LeftCorners<T> {
     const leftCorners = new LeftCorners(ZERO);
 
     // Sum all probabilities for left corners

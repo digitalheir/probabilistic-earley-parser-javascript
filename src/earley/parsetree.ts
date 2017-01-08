@@ -12,9 +12,10 @@ import {Category} from "../grammar/category";
 export interface ParseTree<T> {
     category: Category<T>;
     children: ParseTree<T>[];
-    token?: T
+    token?: T;
 }
 
+//noinspection JSUnusedGlobalSymbols
 /**
  * Creates a new parse tree with the specified category, parent, and
  * child trees.

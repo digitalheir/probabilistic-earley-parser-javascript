@@ -1,4 +1,4 @@
-import {Set, Map} from 'core-js'
+import {Set, Map} from "core-js";
 import {NonTerminal, Category, isNonTerminal} from "./category";
 import {Rule} from "./rule";
 import {
@@ -6,13 +6,12 @@ import {
     getUnitStarCorners,
     getReflexiveTransitiveClosure,
     LeftCorners
-} from './left-corner'
+} from "./left-corner";
 
-import Semiring from "semiring/semiring";
-import {LogSemiring, makeDeferrable} from "semiring";
+import {Semiring, LogSemiring, makeDeferrable} from "semiring";
 import {Expression} from "semiring/abstract-expression/expression";
 
-function getOrCreateSet<X,Y>(map: Map<X, Set<Y>>, x: X): Set<Y> {
+function getOrCreateSet<X, Y>(map: Map<X, Set<Y>>, x: X): Set<Y> {
     if (map.has(x))
         return map.get(x);
     else {
@@ -62,7 +61,7 @@ export class Grammar<T, SemiringType> {
 
         let done = false;
         while (!done) {
-            let next: IteratorResult<Set<Rule<T>>> = values.next();
+            const next: IteratorResult<Set<Rule<T>>> = values.next();
             done = next.done;
             if (!done) {
                 const rulez = next.value;
@@ -96,8 +95,8 @@ export class Grammar<T, SemiringType> {
         return this.unitStarScores.get(from, to);
     }
 
-    //noinspection JSUnusedGlobalSymbols
-    static withSemiring<T,Y>(semiringMapping: ProbabilitySemiringMapping<Y>, name?: string): GrammarBuilder<T, Y> {
+    // noinspection JSUnusedGlobalSymbols
+    static withSemiring<T, Y>(semiringMapping: ProbabilitySemiringMapping<Y>, name?: string): GrammarBuilder<T, Y> {
         return new GrammarBuilder<T, Y>(semiringMapping, name);
     }
 
@@ -147,10 +146,10 @@ export class GrammarBuilder<T, SemiringType> {
     }
 
     addRule(rule: Rule<T>): GrammarBuilder<T, SemiringType> {
-        if (!rule.probability || typeof rule.probability !== 'number')
+        if (!rule.probability || typeof rule.probability !== "number")
             throw new Error("Probability not defined: " + rule.probability);
         if (!rule.left) throw new Error("Left hand side not defined: " + rule.left);
-        if (!rule.right || !rule.right.length || typeof rule.right.length !== 'number'! || rule.right.length <= 0)
+        if (!rule.right || !rule.right.length || typeof rule.right.length !== "number"! || rule.right.length <= 0)
             throw new Error("Right hand side not defined: " + rule.right);
 
         if (this.ruleMap.has(rule.left)) {
@@ -159,11 +158,11 @@ export class GrammarBuilder<T, SemiringType> {
                     for (let i = 0; i < rule.right.length; i++) if (rule.right[i] !== rle.right[i]) return;
                     throw new Error("Already added rule " + rule.left + " -> " + rule.right.toString());
                 }
-            })
+            });
         }
 
         getOrCreateSet(this.ruleMap, rule.left).add(rule);
-        
+
         return this;
     }
 

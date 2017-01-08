@@ -1,19 +1,19 @@
 //noinspection ES6UnusedImports
-import {Set, Map} from 'core-js'
+import {Set, Map} from "core-js";
 import {StateIndex} from "./state-index";
 import {Grammar} from "../../grammar/grammar";
 import {State, isCompleted, isActive, getActiveCategory} from "./state";
 import {NonTerminal, Terminal, isNonTerminal} from "../../grammar/category";
-import {Semiring} from "semiring/semiring";
+import {Semiring} from "semiring";
 import {getOrCreateSet, getOrCreateMap} from "../../util";
 import {isUnitProduction, Rule, invalidDotPosition} from "../../grammar/rule";
 import {ViterbiScore} from "./viterbi-score";
 import {StateToObjectMap} from "./state-to-object-map";
 
 export class Chart<T, S> {
-    readonly grammar: Grammar<T,S>;
+    readonly grammar: Grammar<T, S>;
 
-    private states: StateIndex<S,T>;
+    private states: StateIndex<S, T>;
     private byIndex: Map<number, Set<State<S, T>>>;
 
     /**
@@ -33,8 +33,8 @@ export class Chart<T, S> {
      * Note that this is conditional on the chart happening at position k with
      * a certain non-terminal X
      */
-    private innerScores: StateToObjectMap<T,S>;
-    private viterbiScores: StateToObjectMap<T,ViterbiScore<S,T>>;
+    private innerScores: StateToObjectMap<T, S>;
+    private viterbiScores: StateToObjectMap<T, ViterbiScore<S, T>>;
 
     completedStates: Map<number, Set<State<S, T>>>;
     completedStatesFor: Map<number, Map<NonTerminal, Set<State<S, T>>>>;
@@ -47,13 +47,13 @@ export class Chart<T, S> {
     private EMPTY_SET: Set<State<S, T>> = new Set<State<S, T>>();
 
 
-    constructor(grammar: Grammar<T,S>) {
-        this.states = new StateIndex<S,T>();
+    constructor(grammar: Grammar<T, S>) {
+        this.states = new StateIndex<S, T>();
         this.grammar = grammar;
 
-        this.forwardScores = new StateToObjectMap<T,S>();
-        this.innerScores = new StateToObjectMap<T,S>();
-        this.viterbiScores = new StateToObjectMap<T,ViterbiScore<S,T>>();
+        this.forwardScores = new StateToObjectMap<T, S>();
+        this.innerScores = new StateToObjectMap<T, S>();
+        this.viterbiScores = new StateToObjectMap<T, ViterbiScore<S, T>>();
         this.byIndex = new Map<number, Set<State<S, T>>>();
         this.completedStates = new Map<number, Set<State<S, T>>>();
         this.completedStatesFor = new Map<number, Map<NonTerminal, Set<State<S, T>>>>();
@@ -92,11 +92,11 @@ export class Chart<T, S> {
 // }
 //
 
-    getStatesActiveOnNonTerminalWithNonZeroUnitStarScoreToY(index: number, Y: NonTerminal): Set<State<S,T>> {
+    getStatesActiveOnNonTerminalWithNonZeroUnitStarScoreToY(index: number, Y: NonTerminal): Set<State<S, T>> {
         return getOrCreateSet(getOrCreateMap(this.nonTerminalActiveAtIWithNonZeroUnitStarToY, index), Y);
     }
 
-    getStatesActiveOnNonTerminal(y: NonTerminal, position: number, beforeOrOnPosition: number): Set<State<S,T>> {
+    getStatesActiveOnNonTerminal(y: NonTerminal, position: number, beforeOrOnPosition: number): Set<State<S, T>> {
         if (position <= beforeOrOnPosition)
             return getOrCreateSet(getOrCreateMap(this.statesActiveOnNonTerminal, y), position);
         else
@@ -114,21 +114,20 @@ export class Chart<T, S> {
     }
 
 
-    addForwardScore(state: State<S,T>, increment: S, semiring: Semiring<S>):S {
-        let theState = state;
-
-        let fw = semiring.plus(this.getForwardScore(theState)/*default zero*/, increment);
+    addForwardScore(state: State<S, T>, increment: S, semiring: Semiring<S>): S {
+        const fw = semiring.plus(this.getForwardScore(state)/*default zero*/, increment);
         this.setForwardScore(
-            theState,
+            state,
             fw
         );
         return fw;
     }
 
-    setForwardScore(s: State<S,T>, probability: S) {
+    setForwardScore(s: State<S, T>, probability: S) {
         return this.forwardScores.putByState(s, probability);
     }
 
+    //noinspection JSUnusedLocalSymbols
     private hasForwardScore(s: State<S, T>): boolean {
         return this.forwardScores.hasByState(s);
     }
@@ -136,7 +135,7 @@ export class Chart<T, S> {
     public  getState(rule: Rule<T>,
                      positionInInput: number,
                      ruleStartPosition: number,
-                     ruleDotPosition: number): State<S,T> {
+                     ruleDotPosition: number): State<S, T> {
         return this.states.getState(rule, positionInInput, ruleStartPosition, ruleDotPosition);
     }
 
@@ -154,7 +153,7 @@ export class Chart<T, S> {
                        ruleStartPosition: number,
                        ruleDotPosition: number,
                        rule: Rule<T>,
-                       scannedToken?: T): State<S,T> {
+                       scannedToken?: T): State<S, T> {
         if (this.states.has(rule, positionInInput, ruleStartPosition, ruleDotPosition)) {
             return this.states.getState(rule, positionInInput, ruleStartPosition, ruleDotPosition);
         } else {
@@ -226,27 +225,28 @@ export class Chart<T, S> {
         }
     }
 
-    setInnerScore(s: State<S,T>, probability: S) {
+    setInnerScore(s: State<S, T>, probability: S) {
         this.innerScores.putByState(s, probability);
     }
 
     /**
      * @param v viterbi score
      */
-    setViterbiScore(v: ViterbiScore<S,T>) {
+    setViterbiScore(v: ViterbiScore<S, T>) {
         this.viterbiScores.putByState(v.resultingState, v);
     }
 
-    getViterbiScore(s: State<S,T>): ViterbiScore<S,T> {
+    getViterbiScore(s: State<S, T>): ViterbiScore<S, T> {
         /*if (!this.hasViterbiScore(s))
-            throw new Error(
-                "Viterbi not available for chart ("
-                + s.position + ", " + s.ruleStartPosition + ", " + s.ruleDotPosition
-                + ") " + s.rule.left + " -> " + s.rule.right.map(f => f.toString()));
-        else */return this.viterbiScores.getByState(s);
+         throw new Error(
+         "Viterbi not available for chart ("
+         + s.position + ", " + s.ruleStartPosition + ", " + s.ruleDotPosition
+         + ") " + s.rule.left + " -> " + s.rule.right.map(f => f.toString()));
+         else */
+        return this.viterbiScores.getByState(s);
     }
 
-    hasViterbiScore(s: State<S,T>): boolean {
+    hasViterbiScore(s: State<S, T>): boolean {
         return this.viterbiScores.hasByState(s);
     }
 
@@ -265,9 +265,9 @@ export class Chart<T, S> {
     }
 
     public getCompletedStates(position: number) {
-    if(this.completedStates.has(position))
-        return this.completedStates.get(position);
-    else return this.EMPTY_SET;
+        if (this.completedStates.has(position))
+            return this.completedStates.get(position);
+        else return this.EMPTY_SET;
     }
 
     public getStatesActiveOnNonTerminals(index: number) {
