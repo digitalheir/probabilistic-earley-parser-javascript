@@ -137,7 +137,8 @@ console.log(treeify.asTree(makeTree(viterbi.parseTree)));
 ````
 
 ## Some notes on implementation
-Written in TypeScript, compiled to ES5 UMD modules.
+
+Written in TypeScript, published as a [commonjs module on NPM](https://www.npmjs.com/package/probabilistic-earley-parser) and a [single-file minified UMD module on Github](https://github.com/digitalheir/probabilistic-earley-parser-javascript/releases) in vulgar ES5.
 
 The probability of a parse is defined as the product of the probalities all the applied rules. Usually,
 we define probability as a number between 0 and 1 inclusive, and use common algebraic notions of addition and

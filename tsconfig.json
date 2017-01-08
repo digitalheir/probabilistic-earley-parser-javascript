@@ -7,7 +7,7 @@
     "noImplicitAny": true,
     "preserveConstEnums": true,
     "removeComments": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "target": "es5",
     "outDir": "dist"
   },
