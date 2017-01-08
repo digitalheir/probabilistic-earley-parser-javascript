@@ -1,5 +1,5 @@
 import {Set, Map} from "core-js";
-import {NonTerminal, Category, isNonTerminal} from "./category";
+import {NonTerminal, Category, isNonTerminal, Terminal} from "./category";
 import {Rule} from "./rule";
 import {
     getLeftCorners,
@@ -32,8 +32,9 @@ export interface ProbabilitySemiringMapping<Y> {
 export class Grammar<T, SemiringType> {
     readonly name: string;
     readonly ruleMap: Map<NonTerminal, Set<Rule<T>>>;
-    readonly rules: Set<Rule<T>>;
-    readonly nonTerminals: Set<NonTerminal>;
+    readonly rules: Set<Rule<T>> = new Set<Rule<T>>();
+    readonly nonTerminals: Set<NonTerminal> = new Set<NonTerminal>();
+    readonly terminals: Terminal<T>[];
 
     //
     // pre-compute some scores for efficient earley parsing
@@ -49,17 +50,16 @@ export class Grammar<T, SemiringType> {
                 ruleMap: Map<NonTerminal, Set<Rule<T>>>,
                 probabilityMapping: ProbabilitySemiringMapping<SemiringType>) {
         this.name = name;
-
         this.ruleMap = ruleMap;
-        this.nonTerminals = new Set<NonTerminal>();
-        this.rules = new Set<Rule<T>>();
 
         this.probabilityMapping = probabilityMapping;
         this.deferrableSemiring = makeDeferrable(probabilityMapping.semiring);
 
         const values: IterableIterator<Set<Rule<T>>> = ruleMap.values();
 
+
         let done = false;
+        const terminals = new Set<Terminal<T>>();
         while (!done) {
             const next: IteratorResult<Set<Rule<T>>> = values.next();
             done = next.done;
@@ -68,13 +68,17 @@ export class Grammar<T, SemiringType> {
                 rulez.forEach(rule => {
                         this.rules.add(rule);
                         this.nonTerminals.add(rule.left);
-                        rule.right.filter(isNonTerminal).forEach((a: NonTerminal) =>
-                            this.nonTerminals.add(a)
-                        );
+                        rule.right.forEach((a: Category<T>) => {
+                            if (isNonTerminal(a))
+                                this.nonTerminals.add(a);
+                            else
+                                terminals.add(a);
+                        });
                     }
                 );
             }
         }
+        this.terminals = Array.from(terminals);
 
         const zero = 0.0;
         this.leftCorners = getLeftCorners(this.rules, zero);

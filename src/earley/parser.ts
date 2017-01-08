@@ -1,5 +1,5 @@
 import {Grammar} from "../grammar/grammar";
-import {NonTerminal, Category, isNonTerminal} from "../grammar/category";
+import {NonTerminal, Category, isNonTerminal, Terminal, WordWithTypes} from "../grammar/category";
 import {Rule} from "../grammar/rule";
 import {State} from "./chart/state";
 import {setViterbiScores, ViterbiScore} from "./chart/viterbi-score";
@@ -10,12 +10,12 @@ import {complete} from "./complete";
 import {ParseTree, addRightMost} from "./parsetree";
 
 export function addState<S, T>(stateSets: Chart<T, S>,
-                       index: number,
-                       ruleStartPosition: number,
-                       ruleDotPosition: number,
-                       rule: Rule<T>,
-                       forward: S,
-                       inner: S): State<S, T> {
+                               index: number,
+                               ruleStartPosition: number,
+                               ruleDotPosition: number,
+                               rule: Rule<T>,
+                               forward: S,
+                               inner: S): State<S, T> {
     const state = stateSets.getOrCreate(index, ruleStartPosition, ruleDotPosition, rule);
     stateSets.setInnerScore(state, inner);
     stateSets.setForwardScore(state, forward);
@@ -87,9 +87,11 @@ export function getViterbiParseFromChart<S, T>(state: State<S, T>, chart: Chart<
     }
 }
 
+
+
 export function parseSentenceIntoChart<S, T>(Start: NonTerminal,
-                                            grammar: Grammar<T, S>,
-                                            tokens: T[]): [Chart<T, S>, number, State<S, T>] {
+                                             grammar: Grammar<T, S>,
+                                             tokens: T[]): [Chart<T, S>, number, State<S, T>] {
     // ScanProbability scanProbability//TODO
 
     const stateSets: Chart<T, S> = new Chart(grammar);
@@ -98,6 +100,18 @@ export function parseSentenceIntoChart<S, T>(Start: NonTerminal,
     // new State(
     //     Rule.create(sr, 1.0, Category.START, S), 0
     // );
+
+    // Index words to their applicable terminals
+    const wordToTypesMap = new Map<T, Terminal<T>[]>();
+    const tokensWithWords: WordWithTypes<T>[] = tokens.map(word => {
+        if (wordToTypesMap.has(word))
+            return {types: wordToTypesMap.get(word), word};
+        else {
+            const types: Terminal<T>[] = grammar.terminals.filter((isOfType: Terminal<T>) => isOfType(word));
+            wordToTypesMap.set(word, types);
+            return {types, word};
+        }
+    });
 
     const init = addState(
         stateSets, 0, 0, 0,
@@ -108,8 +122,8 @@ export function parseSentenceIntoChart<S, T>(Start: NonTerminal,
 
     // Cycle through input
     let i = 0;
-    tokens.forEach(
-        (token: T) => {
+    tokensWithWords.forEach(
+        (token: WordWithTypes<T>) => {
             predict(i, grammar, stateSets);
             scan(i, token, grammar.probabilityMapping.semiring, stateSets);
             complete(i + 1, stateSets, grammar);
@@ -138,8 +152,8 @@ export interface ParseTreeWithScore<T> {
 }
 
 export function getViterbiParse<S, T>(Start: NonTerminal,
-                                     grammar: Grammar<T, S>,
-                                     tokens: T[]): ParseTreeWithScore<T> {
+                                      grammar: Grammar<T, S>,
+                                      tokens: T[]): ParseTreeWithScore<T> {
     const [chart, ignored, init] = parseSentenceIntoChart(Start, grammar, tokens);
 
     const finalState = chart.getOrCreate(

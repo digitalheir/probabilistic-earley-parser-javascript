@@ -1,4 +1,4 @@
-import {isNonTerminal} from "../grammar/category";
+import {isNonTerminal, WordWithTypes} from "../grammar/category";
 import {Semiring} from "semiring";
 import {Chart} from "./chart/chart";
 import {getActiveCategory, State, advanceDot} from "./chart/state";
@@ -8,13 +8,14 @@ import {getActiveCategory, State, advanceDot} from "./chart/state";
  * Handles a token scanned from the input string.
  *
  * @param tokenPosition   The start index of the scan.
- * @param token           The token that was scanned.
+ * @param word
+ * @param types
  * //@param scanProbability Function that provides the probability of scanning the given token at this position. Might be null for a probability of 1.0.
  * @param sr
  * @param stateSets
  */
 export function scan<S, T>(tokenPosition: number,
-                           token: T,
+    {word, types}: WordWithTypes<T>,
                            // scanProbability:(x:T)=>number,//TODO
                            sr: Semiring<S>,
                            stateSets: Chart<T, S>) {
@@ -27,13 +28,14 @@ export function scan<S, T>(tokenPosition: number,
      * Get all states that are active on a terminal
      *   O(|stateset(i)|) = O(|grammar|): For all states <code>i: X<sub>k</sub> → λ·tμ</code>, where t is a terminal that matches the given token...
      */
-
-    const statesActiveOnTerminals: Set<State<S, T>> = stateSets.getStatesActiveOnTerminals(tokenPosition);
-    if (statesActiveOnTerminals) statesActiveOnTerminals.forEach((preScanState: State<S, T>) => {
-        const activeCategory = getActiveCategory(preScanState);
-        if (isNonTerminal(activeCategory)) throw new Error("this is a bug");
-        else {
-            if (activeCategory(token)) { // TODO can this be more efficient, ie have tokens make their category be explicit? (Do we want to maintain the possibility of such "fluid" categories?)
+    types.forEach(terminal => {
+        const statesActiveOnTerminals: Set<State<S, T>> = stateSets.getStatesActiveOnTerminals(tokenPosition, terminal);
+        if (statesActiveOnTerminals) statesActiveOnTerminals.forEach((preScanState: State<S, T>) => {
+            const activeCategory = getActiveCategory(preScanState);
+            if (isNonTerminal(activeCategory)) throw new Error("this is a bug");
+            else {
+                if (!activeCategory(word)) throw new Error("Index failed");
+                // TODO can this be more efficient, ie have tokens make their category be explicit? (Do we want to maintain the possibility of such "fluid" categories?)
                 // Create the chart <code>i+1: X<sub>k</sub> → λt·μ</code>
                 const preScanForward: S = stateSets.getForwardScore(preScanState);
                 const preScanInner: S = stateSets.getInnerScore(preScanState);
@@ -42,7 +44,7 @@ export function scan<S, T>(tokenPosition: number,
                     tokenPosition + 1, preScanState.ruleStartPosition,
                     advanceDot(preScanState),
                     preScanState.rule,
-                    token
+                    word
                 );
 
                 const postScanForward = calculateForwardScore(sr, preScanForward, scanProb);
@@ -76,7 +78,7 @@ export function scan<S, T>(tokenPosition: number,
                     forward: postScanForward
                 });
             }
-        }
+        });
     });
     return changes;
 }

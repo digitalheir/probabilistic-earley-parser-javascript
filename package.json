@@ -1,11 +1,11 @@
 {
   "name": "probabilistic-earley-parser",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "A parser for parsing Probabilistic Context Free Grammars",
   "main": "dist/index.js",
   "author": "Maarten Trompper",
   "license": "MIT",
-  "repository": "git@github.com:digitalheir/java-probabilistic-earley-parser.git",
+  "repository": "git@github.com:digitalheir/probabilistic-earley-parser-javascript.git",
   "scripts": {
     "build": "npm run build:clean && npm run build:npm && npm run build:cp && npm run build:min",
     "build:clean": "rimraf dist",

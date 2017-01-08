@@ -13,8 +13,8 @@ import {StateToObjectMap} from "./state-to-object-map";
 export class Chart<T, S> {
     readonly grammar: Grammar<T, S>;
 
-    private states: StateIndex<S, T>;
-    private byIndex: Map<number, Set<State<S, T>>>;
+    private states = new StateIndex<S, T>();
+    private byIndex = new Map<number, Set<State<S, T>>>();
 
     /**
      * The forward probability <code>α_i</code> of a chart is
@@ -23,7 +23,7 @@ export class Chart<T, S> {
      * paths from start to position i. So this includes multiple
      * instances of the same history, which may happen because of recursion.
      */
-    private forwardScores: StateToObjectMap<T, S>;
+    private forwardScores = new StateToObjectMap<T, S>();
 
     /**
      * The inner probability <code>γ_{i}</code> of a chart
@@ -33,36 +33,22 @@ export class Chart<T, S> {
      * Note that this is conditional on the chart happening at position k with
      * a certain non-terminal X
      */
-    private innerScores: StateToObjectMap<T, S>;
-    private viterbiScores: StateToObjectMap<T, ViterbiScore<S, T>>;
+    private innerScores = new StateToObjectMap<T, S>();
+    private viterbiScores = new StateToObjectMap<T, ViterbiScore<S, T>>();
 
-    completedStates: Map<number, Set<State<S, T>>>;
-    completedStatesFor: Map<number, Map<NonTerminal, Set<State<S, T>>>>;
-    completedStatesThatAreNotUnitProductions: Map<number, Set<State<S, T>>>;
-    statesActiveOnNonTerminals: Map<number, Set<State<S, T>>>;
+    completedStates = new Map<number, Set<State<S, T>>>();
+    completedStatesFor = new Map<number, Map<NonTerminal, Set<State<S, T>>>>();
+    completedStatesThatAreNotUnitProductions = new Map<number, Set<State<S, T>>>();
+    statesActiveOnNonTerminals = new Map<number, Set<State<S, T>>>();
 
-    nonTerminalActiveAtIWithNonZeroUnitStarToY: Map<number, Map<NonTerminal, Set<State<S, T>>>>;
-    statesActiveOnTerminals: Map<number, Set<State<S, T>>>;
-    statesActiveOnNonTerminal: Map<NonTerminal, Map<number, Set<State<S, T>>>>;
+    nonTerminalActiveAtIWithNonZeroUnitStarToY = new Map<number, Map<NonTerminal, Set<State<S, T>>>>();
+    statesActiveOnTerminals = new Map<number, Map<Terminal<T>, Set<State<S, T>>>>();
+    statesActiveOnNonTerminal = new Map<NonTerminal, Map<number, Set<State<S, T>>>>();
     private EMPTY_SET: Set<State<S, T>> = new Set<State<S, T>>();
 
 
     constructor(grammar: Grammar<T, S>) {
-        this.states = new StateIndex<S, T>();
         this.grammar = grammar;
-
-        this.forwardScores = new StateToObjectMap<T, S>();
-        this.innerScores = new StateToObjectMap<T, S>();
-        this.viterbiScores = new StateToObjectMap<T, ViterbiScore<S, T>>();
-        this.byIndex = new Map<number, Set<State<S, T>>>();
-        this.completedStates = new Map<number, Set<State<S, T>>>();
-        this.completedStatesFor = new Map<number, Map<NonTerminal, Set<State<S, T>>>>();
-        this.completedStatesThatAreNotUnitProductions = new Map<number, Set<State<S, T>>>();
-        this.statesActiveOnNonTerminals = new Map<number, Set<State<S, T>>>();
-
-        this.nonTerminalActiveAtIWithNonZeroUnitStarToY = new Map<number, Map<NonTerminal, Set<State<S, T>>>>();
-        this.statesActiveOnTerminals = new Map<number, Set<State<S, T>>>();
-        this.statesActiveOnNonTerminal = new Map<NonTerminal, Map<number, Set<State<S, T>>>>();
     }
 
 // getCompletedStates(int i, NonTerminal s):Set<State<SemiringType, T>> {
@@ -220,7 +206,7 @@ export class Chart<T, S> {
                     });
             } else {
                 // activeCategory MUST be terminal
-                getOrCreateSet(this.statesActiveOnTerminals, position).add(state);
+                getOrCreateSet(getOrCreateMap(this.statesActiveOnTerminals, position), activeCategory).add(state);
             }
         }
     }
@@ -274,8 +260,11 @@ export class Chart<T, S> {
         return this.statesActiveOnNonTerminals.get(index);
     }
 
-    public getStatesActiveOnTerminals(index: number) {
-        return this.statesActiveOnTerminals.get(index);
+    public getStatesActiveOnTerminals(index: number, terminal: Terminal<T>) {
+        if (this.statesActiveOnTerminals.has(index))
+            return this.statesActiveOnTerminals.get(index).get(terminal);
+        else
+            return undefined;
     }
 
     // public hasInnerScore(s: State<S, T>): boolean {
