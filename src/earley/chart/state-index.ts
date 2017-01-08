@@ -1,4 +1,3 @@
-// import {Set, Map} from "core-js"
 import {Rule} from "../../grammar/rule";
 import {State} from "./state";
 import {StateToObjectMap} from "./state-to-object-map";

@@ -1,5 +1,4 @@
 //noinspection ES6UnusedImports
-import {Set, Map} from "core-js";
 import {StateIndex} from "./state-index";
 import {Grammar} from "../../grammar/grammar";
 import {State, isCompleted, isActive, getActiveCategory} from "./state";
