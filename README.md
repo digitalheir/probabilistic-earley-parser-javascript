@@ -5,12 +5,9 @@
 
 # Probabilistic Earley parser
 
-This is an implementation of a probabilistic Earley parsing algorithm, which can parse any Probabilistic Context Free Grammar (PCFG) (also
-known as Stochastic Context Free Grammar (SCFG)),
-or equivalently any language described in Backus-Naur Form (BNF). In these grammars, 
-rewrite rules may be non-deterministic and have a probability attached to them.
+This is a library for parsing a string of tokens (like words) into parse trees that are weighted by probability. For example: you might want to know the probabilities for all derivations of an English sentence, or the most likely table of contents structure for a list of paragraphs. This library allows you to do so efficiently, as long as you can describe the rules as a [Context-free Grammar](https://en.wikipedia.org/wiki/Context-free_grammar) (CFG).
 
-
+The innovation of this library with respect to the gazillion other parsing libraries is that this one allows the poduction rules in your grammar to have a probability attached to them. This allows us to make a better choice in case of an ambiguous sentence: just select the derivation with the highest probability (this is called the Viterbi parse).  If you do not need probabilities attached to your parse trees, you are probably better off using [nearley](http://nearley.js.org) instead.
 
 For a theoretical grounding of this work, refer to [*Stolcke, An Efficient Probabilistic Context-Free
            Parsing Algorithm that Computes Prefix
@@ -140,6 +137,11 @@ console.log(treeify.asTree(makeTree(viterbi.parseTree)));
 
 Written in TypeScript, published as a [commonjs module on NPM](https://www.npmjs.com/package/probabilistic-earley-parser) and a [single-file minified UMD module on Github](https://github.com/digitalheir/probabilistic-earley-parser-javascript/releases) in vulgar ES5.
 
+This is an implementation of a probabilistic Earley parsing algorithm, which can parse any Probabilistic Context Free Grammar (PCFG) (also
+known as Stochastic Context Free Grammar (SCFG)),
+or equivalently any language described in Backus-Naur Form (BNF). In these grammars, 
+rewrite rules may be non-deterministic and have a probability attached to them.
+
 The probability of a parse is defined as the product of the probalities all the applied rules. Usually,
 we define probability as a number between 0 and 1 inclusive, and use common algebraic notions of addition and
 multiplication.
@@ -151,6 +153,7 @@ semiring which holds the minus log of the probability. So that maps the numbers 
 between infinity and zero, skewed towards lower probabilities:
 
 #### Graph plot of f(x) = -log(x)
+
 ![Graph for f(x) = -log x](https://leibniz.cloudant.com/assets/_design/ddoc/graph%20for%20-log%20x.PNG)
 
 
@@ -167,12 +170,10 @@ Note that this implementation does not apply innovations such as [Joop Leo's imp
 For a faster parser that work on non-probabilistic grammars, look into [nearley](nearley.js.org).
 
 ### Limitations
-* I have not provisioned for ε-rules
+* I have not provisioned for ε-rules (rules with an empty right hand side)
 * Rule probability estimation may be performed using the inside-outside algorithm, but is not currently implemented
 * Higher level concepts such as wildcards, * and + are not implemented
-* Viterbi parsing (querying the most likely parse tree) only returns one single parse. In the case of an ambiguous sentence, the returned parse is not guaranteed the left-most parse.
-* Behavior for strangely defined grammars is not defined, such as when the same rule is defined multiple times with
-  a different probability
+* Viterbi parsing (querying the most likely parse tree) only returns one single parse. In the case of an ambiguous sentence in which multiple dervation have the highest probability, the returned parse is not guaranteed the left-most parse (I think).
 
 ## License
 This software is licensed under a permissive [MIT license](https://opensource.org/licenses/MIT).
