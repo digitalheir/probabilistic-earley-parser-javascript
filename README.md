@@ -7,7 +7,7 @@
 
 This is a library for parsing a string of tokens (like words) into parse trees that are weighted by probability. For example: you might want to know the probabilities for all derivations of an English sentence, or the most likely table of contents structure for a list of paragraphs. This library allows you to do so efficiently, as long as you can describe the rules as a [Context-free Grammar](https://en.wikipedia.org/wiki/Context-free_grammar) (CFG).
 
-The innovation of this library with respect to the gazillion other parsing libraries is that this one allows the poduction rules in your grammar to have a probability attached to them. This allows us to make a better choice in case of an ambiguous sentence: the derivations are weighted by probability. If you do not need probabilities attached to your parse trees, you are probably better off using [nearley](http://nearley.js.org) instead.
+The innovation of this library with respect to the gazillion other parsing libraries is that this one allows the poduction rules in your grammar to have a probability attached to them. This allows us to make a better choice in case of an ambiguous sentence: just select the derivation with the highest probability (this is called the Viterbi parse).  If you do not need probabilities attached to your parse trees, you are probably better off using [nearley](http://nearley.js.org) instead.
 
 For a theoretical grounding of this work, refer to [*Stolcke, An Efficient Probabilistic Context-Free
            Parsing Algorithm that Computes Prefix
