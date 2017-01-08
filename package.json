@@ -1,6 +1,6 @@
 {
   "name": "probabilistic-earley-parser",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "A parser for parsing Probabilistic Context Free Grammars",
   "main": "dist/index.js",
   "author": "Maarten Trompper",
@@ -18,12 +18,12 @@
     "test:earley": "mocha -r ts-node/register test/**/earley.spec.ts"
   },
   "dependencies": {
+    "@types/core-js": "^0.9.35",
     "core-js": "^2.4.1",
     "semiring": "^1.2.3"
   },
   "devDependencies": {
     "@types/chai": "^3.4.34",
-    "@types/core-js": "0.9.35",
     "@types/mocha": "^2.2.34",
     "rimraf": "^2.5.4",
     "chai": "^3.5.0",
