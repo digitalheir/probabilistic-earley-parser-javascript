@@ -169,7 +169,7 @@ Note that this implementation does not apply innovations such as [Joop Leo's imp
 For a faster parser that work on non-probabilistic grammars, look into [nearley](nearley.js.org).
 
 ### Limitations
-* I have not provisioned for ε-rules
+* I have not provisioned for ε-rules (rules with an empty right hand side)
 * Rule probability estimation may be performed using the inside-outside algorithm, but is not currently implemented
 * Higher level concepts such as wildcards, * and + are not implemented
 * Viterbi parsing (querying the most likely parse tree) only returns one single parse. In the case of an ambiguous sentence in which multiple dervation have the highest probability, the returned parse is not guaranteed the left-most parse (I think).
