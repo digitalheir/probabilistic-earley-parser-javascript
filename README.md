@@ -172,7 +172,7 @@ For a faster parser that work on non-probabilistic grammars, look into [nearley]
 * I have not provisioned for ε-rules
 * Rule probability estimation may be performed using the inside-outside algorithm, but is not currently implemented
 * Higher level concepts such as wildcards, * and + are not implemented
-* Viterbi parsing (querying the most likely parse tree) only returns one single parse. In the case of an ambiguous sentence, the returned parse is not guaranteed the left-most parse.
+* Viterbi parsing (querying the most likely parse tree) only returns one single parse. In the case of an ambiguous sentence in which multiple dervation have the highest probability, the returned parse is not guaranteed the left-most parse (I think).
 
 ## License
 This software is licensed under a permissive [MIT license](https://opensource.org/licenses/MIT).
