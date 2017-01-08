@@ -1,4 +1,3 @@
-import {Set, Map} from "core-js";
 import {NonTerminal, Category, isNonTerminal, Terminal} from "./category";
 import {Rule} from "./rule";
 import {

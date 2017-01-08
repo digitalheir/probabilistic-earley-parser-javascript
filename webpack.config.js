@@ -3,7 +3,16 @@ var webpack = require('webpack'),
     yargs = require('yargs');
 
 var libraryName = 'probabilistic-earley-parser',
-    plugins = [],
+    plugins = [
+        new webpack.LoaderOptionsPlugin({
+            options: {
+                tslint: {
+                    emitErrors: true,
+                    failOnHint: true
+                }
+            }
+        })
+    ],
     outputFile;
 var VERSION = require('./version').default;
 if (yargs.argv.p) {
@@ -21,28 +30,31 @@ var config = {
         path: path.join(__dirname, '/'),
         filename: outputFile,
         library: libraryName,
+
         libraryTarget: 'umd',
         umdNamedDefine: true
     },
     module: {
-        preLoaders: [
-            { test: /\.tsx?$/, loader: 'tslint', exclude: /node_modules/ }
+        rules: [
+            {
+                enforce: 'pre',
+                test: /\.tsx?$/,
+                loader: 'tslint-loader',
+                exclude: /node_modules/
+            },
+            {
+                test: /\.tsx?$/,
+                loader: ['babel-loader', 'awesome-typescript-loader'],
+                exclude: /node_modules/
+            }
         ],
         loaders: [
-            { test: /\.tsx?$/, loader: 'ts', exclude: /node_modules/ }
         ]
     },
     resolve: {
-        root: path.resolve('./src'),
-        extensions: [ '', '.js', '.ts', '.jsx', '.tsx' ]
+        extensions: [ '.js', '.ts', '.jsx', '.tsx' ]
     },
-    plugins: plugins,
-
-    // Individual Plugin Options
-    tslint: {
-        emitErrors: true,
-        failOnHint: true
-    }
+    plugins: plugins
 };
 
 module.exports = config;

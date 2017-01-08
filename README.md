@@ -135,7 +135,7 @@ console.log(treeify.asTree(makeTree(viterbi.parseTree)));
 
 ## Some notes on implementation
 
-Written in TypeScript, published as a [commonjs module on NPM](https://www.npmjs.com/package/probabilistic-earley-parser) and a [single-file minified UMD module on Github](https://github.com/digitalheir/probabilistic-earley-parser-javascript/releases) in vulgar ES5.
+Written in TypeScript, published as a [commonjs module on NPM](https://www.npmjs.com/package/probabilistic-earley-parser) (ES6 with type declarations) and a [single-file minified UMD module on Github](https://github.com/digitalheir/probabilistic-earley-parser-javascript/releases) in vulgar ES5.
 
 This is an implementation of a probabilistic Earley parsing algorithm, which can parse any Probabilistic Context Free Grammar (PCFG) (also
 known as Stochastic Context Free Grammar (SCFG)),

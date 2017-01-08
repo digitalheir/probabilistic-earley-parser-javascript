@@ -1,4 +1,3 @@
-import {Set, Map} from "core-js";
 
 export function getOrCreateMap<X, Y, Z>(map: Map<X, Map<Y, Z>>, key: X): Map<Y, Z> {
     if (map.has(key))

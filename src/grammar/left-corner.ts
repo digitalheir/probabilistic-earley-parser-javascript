@@ -1,8 +1,6 @@
 import {NonTerminal, Category, isNonTerminal} from "./category";
 import {Rule, isUnitProduction} from "./rule";
 import {getOrCreateMap, getOrCreateSet} from "../util";
-//noinspection ES6UnusedImports
-import {Set, Map} from "core-js";
 
 /**
  * Returns the inverse of matrix `M`.
