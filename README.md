@@ -7,15 +7,26 @@
 This is a library for parsing a sequence of tokens (like words) into tree structures, along with the probability that the particular sequence generates that tree structure. This is mainly useful for linguistic purposes, such as morphological parsing, speech recognition and generally information extraction. It also find applications in computational biology. For example:
 
 * As a computational linguist, you want [derive all ways to interpret an English sentence along with probabilities](https://web.stanford.edu/~jurafsky/icassp95-tc.pdf)
-* As a computational biologist, you want to [predict the secondary structure for an RNA sequence](https://en.wikipedia.org/wiki/Stochastic_context-free_grammar#RNA_structure_prediction)
-* As a computational linguist, [you want to know the most likely table of contents structure for a list of paragraphs](https://digitalheir.github.io/java-rechtspraak-library/document-structure/)
-* As a 3D artist, [you want to create a cool random-looking tree](https://en.wikipedia.org/wiki/L-system#Stochastic_grammars)![L-system dragon trees](https://upload.wikimedia.org/wikipedia/commons/7/74/Dragon_trees.jpg)
 
 |tokens|parse tree|
 |---|---|
 |[i, want, british, food]|![i want british food](https://cloud.githubusercontent.com/assets/178797/21772897/64838a1e-d68d-11e6-9a9d-11c7c17cb996.png)|
+
+* As a computational biologist, you want to [predict the secondary structure for an RNA sequence](https://en.wikipedia.org/wiki/Stochastic_context-free_grammar#RNA_structure_prediction)
+
+|tokens|parse tree|
+|---|---|
 |`GGGC``UAUU``AGCU``CAGU` `UGGU``UAGA``GCGC``ACCC` `CUGA``UAAG``GGUG``AGGU` `CGCU``GAUU``CGAA``UUCA` `GCAU``AGCC``CA` |![rna secondary structure](https://cloud.githubusercontent.com/assets/178797/21773639/29bf450a-d690-11e6-9f8b-8e94e83dd32b.png)
 |
+
+* As a 3D artist, [you want to create a cool random-looking tree](https://en.wikipedia.org/wiki/L-system#Stochastic_grammars)![L-system dragon trees](https://upload.wikimedia.org/wikipedia/commons/7/74/Dragon_trees.jpg)
+
+* As a computational linguist, [you want to know the most likely table of contents structure for a list of paragraphs](https://digitalheir.github.io/java-rechtspraak-library/document-structure/)
+
+
+
+
+
 
 This library allows you to do these things [efficiently](https://github.com/digitalheir/probabilistic-earley-parser-javascript#runtime-complexity), as long as you can describe the rules as a [Context-free Grammar](https://en.wikipedia.org/wiki/Context-free_grammar) (CFG).
 
