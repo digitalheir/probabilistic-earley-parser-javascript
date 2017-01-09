@@ -6,10 +6,10 @@
 
 This is a library for parsing a sequence of tokens (like words) into parse trees, along with the probability that the particular sequence generates that parse tree. This is mainly useful for linguistic purposes, such as morphological parsing, speech recognition and generally information extraction. It also find surprising applications in computational biology. For example, some use cases are:
 
-* As a computational linguist, you want all derivations of an English sentence along and with their probabilties
-* As a computational biologist, you want to [predict the secondary structure for an RNA sequence](https://en.wikipedia.org/wiki/Stochastic_context-free_grammar#RNA_structure_prediction).
-* As a 3D artist, [you want to create a cool random-looking tree](https://en.wikipedia.org/wiki/L-system)
-* As a computational linguist, [you want to know the most likely table of contents structure for a list of paragraphs](https://digitalheir.github.io/java-rechtspraak-library/document-structure/).
+* As a computational linguist, you want [derive all ways to interpret an English sentence along with probabilities](https://web.stanford.edu/~jurafsky/icassp95-tc.pdf)
+* As a computational biologist, you want to [predict the secondary structure for an RNA sequence](https://en.wikipedia.org/wiki/Stochastic_context-free_grammar#RNA_structure_prediction)
+* As a 3D artist, [you want to create a cool random-looking tree](https://en.wikipedia.org/wiki/L-system#Stochastic_grammars)![L-system dragon trees](https://upload.wikimedia.org/wikipedia/commons/7/74/Dragon_trees.jpg)
+* As a computational linguist, [you want to know the most likely table of contents structure for a list of paragraphs](https://digitalheir.github.io/java-rechtspraak-library/document-structure/)
 
 This library allows you to do these things [efficiently](https://github.com/digitalheir/probabilistic-earley-parser-javascript#runtime-complexity), as long as you can describe the rules as a [Context-free Grammar](https://en.wikipedia.org/wiki/Context-free_grammar) (CFG).
 
