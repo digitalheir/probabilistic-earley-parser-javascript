@@ -4,7 +4,9 @@
 
 # Probabilistic Earley parser
 
-This is a library for parsing a sequence of tokens (like words) into tree structures, along with the probability that the particular sequence generates that tree structure. This is mainly useful for linguistic purposes, such as morphological parsing, speech recognition and generally information extraction. It also find applications in computational biology. For example:
+This is a library for parsing a sequence of tokens (like words) into tree structures, along with the probability that the particular sequence generates that tree structure. This is mainly useful for linguistic purposes, such as morphological parsing, speech recognition and generally information extraction. It also find applications in computational biology. 
+
+For example:
 
 * As a computational linguist, you want [derive all ways to interpret an English sentence along with probabilities](https://web.stanford.edu/~jurafsky/icassp95-tc.pdf)
 
