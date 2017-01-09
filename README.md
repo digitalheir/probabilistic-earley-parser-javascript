@@ -20,8 +20,6 @@ For example:
 |---|---|
 |`GGGC``UAUU``AGCU``CAGU`<br>`UGGU``UAGA``GCGC``ACCC`<br>`CUGA``UAAG``GGUG``AGGU`<br>`CGCU``GAUU``CGAA``UUCA`<br>`GCAU``AGCC``CA` |![rna secondary structure](https://cloud.githubusercontent.com/assets/178797/21773797/af94f972-d690-11e6-97b4-0aad06071634.jpg)|
 
-* As a 3D artist, [you want to create a cool random-looking tree](https://en.wikipedia.org/wiki/L-system#Stochastic_grammars)![L-system dragon trees](https://upload.wikimedia.org/wikipedia/commons/7/74/Dragon_trees.jpg)
-
 * As a computational linguist, [you want to know the most likely table of contents structure for a list of paragraphs](https://digitalheir.github.io/java-rechtspraak-library/document-structure/)
 
 
