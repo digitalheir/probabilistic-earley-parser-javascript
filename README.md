@@ -31,9 +31,9 @@ For example:
 
 This library allows you to do these things [efficiently](https://github.com/digitalheir/probabilistic-earley-parser-javascript#runtime-complexity), as long as you can describe the rules as a [Context-free Grammar](https://en.wikipedia.org/wiki/Context-free_grammar) (CFG).
 
-The innovation of this library with respect to the many other parsing libraries is that this one allows the poduction rules in your grammar to have a probability attached to them (ie, it parses [Stochastic Context-free Grammars](https://en.wikipedia.org/wiki/Stochastic_context-free_grammar)). This allows us to make a better choice in case of an ambiguous sentence: you just select the derivation with the highest probability. This is called the Viterbi parse.  If you do not need probabilities attached to your parse trees, you are probably better off using [nearley](http://nearley.js.org) instead.
+The innovation of this library with respect to the many other parsing libraries is that this one allows the production rules in your grammar to have a probability attached to them. That is: it parses [Stochastic Context-free Grammars](https://en.wikipedia.org/wiki/Stochastic_context-free_grammar). This allows us to make better choices in case of ambiguous sentences: we can order them by probability. If you do not need probabilities attached to your parse trees, you are probably better off using [nearley](http://nearley.js.org) instead.
 
-It is not trivial to calculate the Viterbi parse efficiently. For a theoretical grounding of this work, refer to [*Stolcke; An Efficient Probabilistic Context-Free
+For a theoretical grounding of this work, refer to [*Stolcke; An Efficient Probabilistic Context-Free
            Parsing Algorithm that Computes Prefix
            Probabilities*](http://www.aclweb.org/anthology/J95-2002).
   
@@ -46,6 +46,9 @@ In many cases Earley also parses faster than CYK (sparse grammars) and it doesn'
 rewritten in any normal form.
    
 ## Usage
+
+Get the most likely parse tree (the *Viterbi parse*) for the sentence "the man chases the man with a stick":
+
 ````javascript
 import {getViterbiParse, Grammar} from 'probabilistic-earley-parser';
 import treeify from 'treeify';
@@ -154,6 +157,8 @@ function printTree(tree) {
 printTree(viterbi.parseTree);
 
 ````
+
+You may pass a function to the parser with an addition probability multiplier for parsed tokens for additional logic that is hard to capture in a grammar. It is also possible to define `predict`, `scan` and `complete` callbacks, but not currently implemented. (Pull requests welcome!)
 
 ## Some notes on implementation
 
