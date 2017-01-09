@@ -12,13 +12,12 @@
     "build:min": "webpack -p",
     "build:npm": "tsc",
     "build:cp": "copyfiles .npmignore README.md package.json dist/",
-    "test": "mocha -r ts-node/register test/**/*.spec.ts",
-    "test:chart": "mocha -r ts-node/register test/**/chart.spec.ts",
-    "test:grammar": "mocha -r ts-node/register test/**/grammar.spec.ts",
-    "test:earley": "mocha -r ts-node/register test/**/earley.spec.ts"
+    "test": "mocha -r ts-babel-node/register test/**/*.spec.ts",
+    "test:chart": "mocha -r ts-babel-node/register test/**/chart.spec.ts",
+    "test:grammar": "mocha -r ts-babel-node/register test/**/grammar.spec.ts",
+    "test:earley": "mocha -r ts-babel-node/register test/**/earley.spec.ts"
   },
   "dependencies": {
-    "babel-preset-es2016": "^6.16.0",
     "semiring": "^1.2.3"
   },
   "devDependencies": {
@@ -31,10 +30,14 @@
     "babel-plugin-transform-class-properties": "^6.6.0",
     "babel-plugin-transform-runtime": "^6.6.0",
     "babel-preset-es2015": "^6.18.0",
+    "babel-preset-es2016": "^6.16.0",
+    "babel-register": "^6.18.0",
     "chai": "^3.5.0",
+    "convert-source-map": "^1.3.0",
     "copyfiles": "^1.0.0",
     "mocha": "^3.2.0",
     "rimraf": "^2.5.4",
+    "ts-babel-node": "^1.1.1",
     "ts-loader": "^1.3.3",
     "ts-node": "^2.0.0",
     "tslint": "^4.3.1",
