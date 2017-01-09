@@ -1,15 +1,21 @@
 ![Build Status](https://travis-ci.org/digitalheir/probabilistic-earley-parser-javascript.svg?branch=master)
-[![npm version](https://badge.fury.io/js/probabilistic-earley-parser.svg)](https://badge.fury.io/js/probabilistic-earley-parser)
-![dev dependencies](https://img.shields.io/david/dev/digitalheir/probabilistic-earley-parser-javascript.svg)
-![License](https://img.shields.io/npm/l/probabilistic-earley-parser.svg)
+[![npm version](https://badge.fury.io/js/probabilistic-earley-parser.svg)](https://www.npmjs.com/package/probabilistic-earley-parser)
+[![License](https://img.shields.io/npm/l/probabilistic-earley-parser.svg)](https://github.com/digitalheir/probabilistic-earley-parser-javascript/blob/master/LICENSE)
 
 # Probabilistic Earley parser
 
-This is a library for parsing a string of tokens (like words) into parse trees that are weighted by probability. For example: you might want to know the probabilities for all derivations of an English sentence, or the most likely table of contents structure for a list of paragraphs. This library allows you to do so efficiently, as long as you can describe the rules as a [Context-free Grammar](https://en.wikipedia.org/wiki/Context-free_grammar) (CFG).
+This is a library for parsing a sequence of tokens (like words) into parse trees, along with the probability that the particular sequence generates that parse tree. This is mainly useful for linguistic purposes, such as morphological parsing, speech recognition and generally information extraction. It also find surprising applications in computational biology. For example, some use cases are:
 
-The innovation of this library with respect to the gazillion other parsing libraries is that this one allows the poduction rules in your grammar to have a probability attached to them. This allows us to make a better choice in case of an ambiguous sentence: just select the derivation with the highest probability (this is called the Viterbi parse).  If you do not need probabilities attached to your parse trees, you are probably better off using [nearley](http://nearley.js.org) instead.
+* As a computational linguist, you want all derivations of an English sentence along and with their probabilties
+* As a computational biologist, you want to [predict the secondary structure for an RNA sequence](https://en.wikipedia.org/wiki/Stochastic_context-free_grammar#RNA_structure_prediction).
+* As a 3D artist, [you want to create a cool random-looking tree](https://en.wikipedia.org/wiki/L-system)
+* As a computational linguist, [you want to know the most likely table of contents structure for a list of paragraphs](https://digitalheir.github.io/java-rechtspraak-library/document-structure/).
 
-For a theoretical grounding of this work, refer to [*Stolcke, An Efficient Probabilistic Context-Free
+This library allows you to do these things [efficiently](https://github.com/digitalheir/probabilistic-earley-parser-javascript#runtime-complexity), as long as you can describe the rules as a [Context-free Grammar](https://en.wikipedia.org/wiki/Context-free_grammar) (CFG).
+
+The innovation of this library with respect to the many other parsing libraries is that this one allows the poduction rules in your grammar to have a probability attached to them (ie, it parses [Stochastic Context-free Grammars](https://en.wikipedia.org/wiki/Stochastic_context-free_grammar)). This allows us to make a better choice in case of an ambiguous sentence: you just select the derivation with the highest probability. This is called the Viterbi parse.  If you do not need probabilities attached to your parse trees, you are probably better off using [nearley](http://nearley.js.org) instead.
+
+It is not trivial to calculate the Viterbi parse efficiently. For a theoretical grounding of this work, refer to [*Stolcke; An Efficient Probabilistic Context-Free
            Parsing Algorithm that Computes Prefix
            Probabilities*](http://www.aclweb.org/anthology/J95-2002).
   
@@ -90,19 +96,6 @@ const viterbi = getViterbiParse(
 
 console.log(viterbi.probability); // 0.6
 
-function makeTree(o){
-    if(o.children && o.children.length > 0){
-        const obj = {
-        };
-        for(var i=0;i<o.children.length;i++){
-            const name = o.children[i].token?o.children[i].token:o.children[i].category;
-            obj[name] = makeTree(o.children[i]);
-        }
-        return obj;
-    }else if(o.token) return o.token;
-    else return o.category;
-}
-
 /*
 0.6
 └─ S
@@ -127,9 +120,20 @@ function makeTree(o){
                └─ N
                   └─ stick
 */
+function printTree(tree) {
+  function makeTree(o){if(o.children && o.children.length > 0){const obj = {};
+        for(var i=0;i<o.children.length;i++){
+            const name = o.children[i].token?o.children[i].token:o.children[i].category;
+            obj[name] = makeTree(o.children[i]);
+        }
+        return obj;
+    }else {if(o.token) {return o.token;}
+    else {return o.category;}}
+  }
+  console.log(treeify.asTree(makeTree(tree)));
+}
 
-
-console.log(treeify.asTree(makeTree(viterbi.parseTree)));
+printTree(viterbi.parseTree);
 
 ````
 
