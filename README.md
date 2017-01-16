@@ -206,3 +206,7 @@ This software is licensed under a permissive [MIT license](https://opensource.or
 ## References
 [Stolcke, Andreas. "An efficient probabilistic context-free parsing algorithm that computes prefix probabilities." *Computational linguistics* 21.2 (1995): 165-201.
 APA](http://www.aclweb.org/anthology/J95-2002)
+
+
+## Contact
+Inquiries go to maarten.trompper@gmail.com
