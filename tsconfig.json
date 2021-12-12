@@ -1,7 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "skipLibCheck": true,
     "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
