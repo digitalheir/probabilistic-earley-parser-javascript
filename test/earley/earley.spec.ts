@@ -1,8 +1,8 @@
 // import {LogSemiring} from "semiring";
 import {expect} from "chai";
 import {Chart} from "../../src/earley/chart/chart";
-import {simpleRecursiveGrammar as g, S, a} from "../sample-grammar";
-import {addState} from "../../src/earley/parser";
+import {simpleRecursiveGrammar as g, S} from "../sample-grammar";
+import {addState} from "../../src";
 // import {scan} from "../../src/earley/scan";
 import {predict} from "../../src/earley/predict";
 // import {complete} from "../../src/earley/complete";
@@ -11,6 +11,7 @@ import {predict} from "../../src/earley/predict";
 describe("parser", () => {
     it("should scan correctly", () => {
         const ss = new Chart(g);
+        // noinspection JSUnusedLocalSymbols
         const init = addState(
             ss, 0, 0, 0,
             {left: "<start>", right: [S], probability: 1.0},

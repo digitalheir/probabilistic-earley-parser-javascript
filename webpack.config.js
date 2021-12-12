@@ -1,8 +1,8 @@
-var webpack = require('webpack'),
-    path = require('path'),
-    yargs = require('yargs');
+const webpack = require('webpack');
+const path = require('path');
+const yargs = require('yargs');
 
-var libraryName = 'probabilistic-earley-parser',
+const libraryName = 'probabilistic-earley-parser',
     plugins = [
         new webpack.LoaderOptionsPlugin({
             options: {
@@ -12,16 +12,17 @@ var libraryName = 'probabilistic-earley-parser',
                 }
             }
         })
-    ],
-    outputFile;
-var VERSION = require('./version').default;
+    ];
+
+let outputFile;
+const VERSION = require('./version').default;
 if (yargs.argv.p) {
-    outputFile = libraryName + '.' + VERSION + '.min.js';
+    outputFile = `${libraryName}.${VERSION}.min.js`;
 } else {
-    outputFile = libraryName + '.' + VERSION + '.js';
+    outputFile = `${libraryName}.${VERSION}.js`;
 }
 
-var config = {
+const config = {
     entry: [
         __dirname + '/src/index.ts'
     ],
@@ -31,28 +32,27 @@ var config = {
         filename: outputFile,
         library: libraryName,
 
-        libraryTarget: 'umd',
+        libraryTarget: "umd",
         umdNamedDefine: true
     },
     module: {
         rules: [
+            // {
+            //     enforce: 'pre',
+            //     test: /\.tsx?$/,
+            //     loader: 'tslint-loader',
+            //     exclude: /node_modules/
+            // },
             {
-                enforce: 'pre',
                 test: /\.tsx?$/,
-                loader: 'tslint-loader',
-                exclude: /node_modules/
-            },
-            {
-                test: /\.tsx?$/,
-                loader: ['babel-loader', 'awesome-typescript-loader'],
+                loader: ['babel-loader', 'ts-loader'],
                 exclude: /node_modules/
             }
         ],
-        loaders: [
-        ]
+        loaders: []
     },
     resolve: {
-        extensions: [ '.js', '.ts', '.jsx', '.tsx' ]
+        extensions: ['.js', '.ts', '.jsx', '.tsx']
     },
     plugins: plugins
 };

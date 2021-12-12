@@ -1,13 +1,13 @@
 //noinspection ES6UnusedImports
-import {StateIndex} from "./state-index";
-import {Grammar} from "../../grammar/grammar";
-import {State, isCompleted, isActive, getActiveCategory} from "./state";
-import {NonTerminal, Terminal, isNonTerminal} from "../../grammar/category";
-import {Semiring} from "semiring";
-import {getOrCreateSet, getOrCreateMap} from "../../util";
-import {isUnitProduction, Rule, invalidDotPosition} from "../../grammar/rule";
-import {ViterbiScore} from "./viterbi-score";
-import {StateToObjectMap} from "./state-to-object-map";
+import { StateIndex } from "./state-index";
+import { Grammar } from "../../grammar/grammar";
+import { State, isCompleted, isActive, getActiveCategory } from "./state";
+import { NonTerminal, Terminal, isNonTerminal } from "../../grammar/category";
+import { Semiring } from "semiring";
+import { getOrCreateSet, getOrCreateMap } from "../../util";
+import { isUnitProduction, Rule, invalidDotPosition } from "../../grammar/rule";
+import { ViterbiScore } from "./viterbi-score";
+import { StateToObjectMap } from "./state-to-object-map";
 
 export class Chart<T, S> {
     readonly grammar: Grammar<T, S>;
@@ -117,10 +117,10 @@ export class Chart<T, S> {
         return this.forwardScores.hasByState(s);
     }
 
-    public  getState(rule: Rule<T>,
-                     positionInInput: number,
-                     ruleStartPosition: number,
-                     ruleDotPosition: number): State<S, T> {
+    public getState(rule: Rule<T>,
+                    positionInInput: number,
+                    ruleStartPosition: number,
+                    ruleDotPosition: number): State<S, T> {
         return this.states.getState(rule, positionInInput, ruleStartPosition, ruleDotPosition);
     }
 
@@ -144,7 +144,7 @@ export class Chart<T, S> {
         } else {
             // Add chart if it does not exist yet
             const scannedCategory: Terminal<T> = scannedToken
-                ? <Terminal<T>> rule.right[ruleDotPosition - 1]
+                ? <Terminal<T>>rule.right[ruleDotPosition - 1]
                 : undefined;
             const state: State<S, T> = {
                 rule,

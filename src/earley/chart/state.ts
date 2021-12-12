@@ -1,5 +1,5 @@
-import {Rule, getActiveCategory as getActiveCategoryFromRule, invalidDotPosition} from "../../grammar/rule";
-import {Category} from "../../grammar/category";
+import { Rule, getActiveCategory as getActiveCategoryFromRule, invalidDotPosition } from "../../grammar/rule";
+import { Category } from "../../grammar/category";
 
 /**
  * A chart chart, describing a pending derivation.
@@ -43,8 +43,8 @@ export interface State<SemiringType, TokenType> {
 export interface StateWithScore<SemiringType, TokenType> {
     forwardScore: SemiringType;
     innerScore: SemiringType;
-    state: State<SemiringType, TokenType> ;
-    origin: State<SemiringType, TokenType> ;
+    state: State<SemiringType, TokenType>;
+    origin: State<SemiringType, TokenType>;
 }
 
 

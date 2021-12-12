@@ -1,8 +1,8 @@
-import {State, advanceDot, isCompleted} from "./state";
-import {ProbabilitySemiringMapping} from "../../grammar/grammar";
-import {Rule} from "../../grammar/rule";
-import {Chart} from "./chart";
-import {NonTerminal} from "../../grammar/category";
+import { State, advanceDot, isCompleted } from "./state";
+import { ProbabilitySemiringMapping } from "../../grammar/grammar";
+import { Rule } from "../../grammar/rule";
+import { Chart } from "./chart";
+import { NonTerminal } from "../../grammar/category";
 
 /**
  * Representing a Viterbi score coming from a certain chart,
@@ -29,9 +29,9 @@ export interface ViterbiScore<S, T> {
  * @param m
  */
 export function setViterbiScores<S, T>(stateSets: Chart<T, S>,
-                               completedState: State<S, T>,
-                               originPathTo: Set<State<S, T>>,
-                               m: ProbabilitySemiringMapping<S>): void {
+                                       completedState: State<S, T>,
+                                       originPathTo: Set<State<S, T>>,
+                                       m: ProbabilitySemiringMapping<S>): void {
     const sr = m.semiring;
     let newStates: State<S, T>[] = undefined; // init as null to avoid array creation
     let newCompletedStates: State<S, T>[] = undefined; // init as null to avoid array creation
@@ -42,7 +42,6 @@ export function setViterbiScores<S, T>(stateSets: Chart<T, S>,
     const completedViterbi: S = stateSets
         .getViterbiScore(completedState)
         .innerScore;
-
 
 
     // noinspection JSSuspiciousNameCombination

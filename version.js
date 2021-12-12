@@ -1,1 +1,1 @@
-exports.default = "0.9.5";
+exports.default = "0.9.6";

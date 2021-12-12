@@ -1,5 +1,5 @@
-import {NonTerminal, Category, isNonTerminal, Terminal} from "./category";
-import {Rule} from "./rule";
+import { NonTerminal, Category, isNonTerminal, Terminal } from "./category";
+import { Rule } from "./rule";
 import {
     getLeftCorners,
     getUnitStarCorners,
@@ -7,13 +7,13 @@ import {
     LeftCorners
 } from "./left-corner";
 
-import {Semiring, LogSemiring, makeDeferrable} from "semiring";
-import {Expression} from "semiring/abstract-expression/expression";
+import { Semiring, LogSemiring, makeDeferrable } from "semiring";
+import { Expression } from "semiring";
 
 function getOrCreateSet<X, Y>(map: Map<X, Set<Y>>, x: X): Set<Y> {
-    if (map.has(x))
+    if (map.has(x)) {
         return map.get(x);
-    else {
+    } else {
         const yToP: Set<Y> = new Set<Y>();
         map.set(x, yToP);
         return yToP;
@@ -22,8 +22,11 @@ function getOrCreateSet<X, Y>(map: Map<X, Set<Y>>, x: X): Set<Y> {
 
 export interface ProbabilitySemiringMapping<Y> {
     semiring: Semiring<Y>;
+
     fromProbability(p: number): Y;
+
     toProbability(p: Y): number;
+
     ZERO: Y;
     ONE: Y;
 }
@@ -38,7 +41,7 @@ export class Grammar<T, SemiringType> {
     //
     // pre-compute some scores for efficient earley parsing
     //
-    private leftCorners: LeftCorners<T>;
+    private readonly leftCorners: LeftCorners<T>;
     readonly leftStarCorners: LeftCorners<T>;
     readonly unitStarScores: LeftCorners<T>;
     readonly probabilityMapping: ProbabilitySemiringMapping<SemiringType>;
@@ -64,7 +67,7 @@ export class Grammar<T, SemiringType> {
             done = next.done;
             if (!done) {
                 const rulez = next.value;
-                rulez.forEach(rule => {
+                rulez.forEach((rule: Rule<T>) => {
                         this.rules.add(rule);
                         this.nonTerminals.add(rule.left);
                         rule.right.forEach((a: Category<T>) => {
@@ -120,9 +123,9 @@ const LOG_SEMIRING: ProbabilitySemiringMapping<number> = {
 
 export class GrammarBuilder<T, SemiringType> {
 
-    private ruleMap: Map<NonTerminal, Set<Rule<T>>>;
+    private readonly ruleMap: Map<NonTerminal, Set<Rule<T>>>;
     // private rules: Set<Rule>;
-    private name: string;
+    private readonly name: string;
     private semiringMapping: ProbabilitySemiringMapping<SemiringType>;
 
     constructor(semiringMapping: ProbabilitySemiringMapping<SemiringType>, name?: string) {

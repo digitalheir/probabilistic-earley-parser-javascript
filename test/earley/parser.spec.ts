@@ -1,9 +1,9 @@
-import {NonTerminal, Terminal} from "../../src/grammar/category";
-import {getViterbiParse, ParseTreeWithScore, Grammar} from "../../src/index";
+import {NonTerminal, Terminal} from "../../src";
+import {getViterbiParse, ParseTreeWithScore, Grammar} from "../../src";
 
 import {expect} from "chai";
 import {g, A} from "../sample-grammar";
-import {parseSentenceIntoChart} from "../../src/earley/parser";
+import {parseSentenceIntoChart} from "../../src";
 
 // TODO
 describe("parser", () => {
@@ -79,6 +79,7 @@ describe("parser", () => {
             .build();
 
         const tokens = ["The", "man", "chased", "the", "man", "with", "a", "stick"];
+        // noinspection JSUnusedLocalSymbols
         const viterbi: ParseTreeWithScore<string> = getViterbiParse(
             S,
             grammar,
@@ -116,6 +117,7 @@ describe("parser", () => {
     });
 
     it("should parse aaae", () => {
+        // noinspection JSUnusedLocalSymbols
         const [chart, ignored, init] = parseSentenceIntoChart(
             A,
             g,

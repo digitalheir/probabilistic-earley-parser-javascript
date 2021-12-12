@@ -1,12 +1,13 @@
-import {State, getActiveCategory, advanceDot, isPassive, isCompleted} from "./chart/state";
-import {Chart} from "./chart/chart";
-import {Grammar} from "../grammar/grammar";
-import {NonTerminal, Category} from "../grammar/category";
-import {Rule, isUnitProduction} from "../grammar/rule";
-import {Expression} from "semiring/abstract-expression/expression";
-import {DeferredStateScoreComputations} from "./chart/addable-expressions-container";
-import {Atom} from "semiring/abstract-expression/atom";
-import {DeferredValue} from "./expression/value";
+import { State, getActiveCategory, advanceDot, isPassive, isCompleted } from "./chart/state";
+import { Chart } from "./chart/chart";
+import { Grammar } from "../grammar/grammar";
+import { NonTerminal, Category } from "../grammar/category";
+import { Rule, isUnitProduction } from "../grammar/rule";
+import { Expression } from "semiring";
+import { DeferredStateScoreComputations } from "./chart/addable-expressions-container";
+import { AtomicValue } from "semiring";
+import { DeferredValue } from "./expression/value";
+
 /**
  * Completes states exhaustively and makes resolvable expressions for the forward and inner scores.
  * Note that these expressions can only be resolved to actual values after finishing completion, because they may depend on one another.
@@ -19,11 +20,11 @@ import {DeferredValue} from "./expression/value";
  * @param stateSets
  */
 function completeNoViterbi<S, T>(position: number,
-                                states: Set<State<S, T>>,
-                                addForwardScores: DeferredStateScoreComputations<S, T>,
-                                addInnerScores: DeferredStateScoreComputations<S, T>,
-                                grammar: Grammar<T, S>,
-                                stateSets: Chart<T, S>) {
+                                 states: Set<State<S, T>>,
+                                 addForwardScores: DeferredStateScoreComputations<S, T>,
+                                 addInnerScores: DeferredStateScoreComputations<S, T>,
+                                 grammar: Grammar<T, S>,
+                                 stateSets: Chart<T, S>) {
     let definitelyNewStates: DeferredStateScoreComputations<S, T>;
 
     // For all states
@@ -39,12 +40,11 @@ function completeNoViterbi<S, T>(position: number,
         const probM = grammar.probabilityMapping;
 
 
-
         const innerScore: S = stateSets.getInnerScore(completedState);
         // TODO pre-create atom?
         const unresolvedCompletedInner: DeferredValue<S> = addInnerScores.getOrCreateByState(
             completedState,
-            new Atom(innerScore)
+            new AtomicValue(innerScore)
         );
 
 
@@ -54,18 +54,18 @@ function completeNoViterbi<S, T>(position: number,
             const innerScore2 = stateSets.getInnerScore(stateToAdvance);
             // TODO pre-create atom?
             const prevInner: DeferredValue<S> = addInnerScores.getOrCreateByState(stateToAdvance,
-                new Atom(innerScore2)
+                new AtomicValue(innerScore2)
             );
             const forwardScore = stateSets.getForwardScore(stateToAdvance);
             // TODO pre-create atom?
             const prevForward: DeferredValue<S> = addForwardScores.getOrCreateByState(stateToAdvance,
-                new Atom(forwardScore)
+                new AtomicValue(forwardScore)
             );
 
             const Z: Category<T> = getActiveCategory(stateToAdvance);
 
             // TODO pre-create atom?
-            const unitStarScore: Expression<S> = new Atom(
+            const unitStarScore: Expression<S> = new AtomicValue(
                 probM.fromProbability(
                     grammar.getUnitStarScore(Z, Y)
                 )
@@ -92,7 +92,6 @@ function completeNoViterbi<S, T>(position: number,
                 newStateDotPosition,
                 fw
             );
-
 
 
             // If this is a new completed chart that is no unit production,
@@ -160,8 +159,8 @@ function completeNoViterbi<S, T>(position: number,
  * @param grammar
  */
 export function complete<S, T>(i: number,
-                              stateSets: Chart<T, S>,
-                              grammar: Grammar<T, S>) {
+                               stateSets: Chart<T, S>,
+                               grammar: Grammar<T, S>) {
     const addForwardScores = new DeferredStateScoreComputations(grammar.deferrableSemiring);
     const addInnerScores = new DeferredStateScoreComputations(grammar.deferrableSemiring);
 

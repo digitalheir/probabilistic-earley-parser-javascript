@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    "skipLibCheck": true,
     "declaration": true,
     "module": "commonjs",
     "moduleResolution": "node",
@@ -8,7 +9,7 @@
     "preserveConstEnums": true,
     "removeComments": true,
     "sourceMap": false,
-    "target": "es6",
+    "target": "es2015",
     "outDir": "dist"
   },
   "include": [

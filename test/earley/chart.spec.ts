@@ -1,5 +1,5 @@
-import {NonTerminal, isNonTerminal, Category} from "../../src/grammar/category";
-import {Rule, isUnitProduction} from "../../src/grammar/rule";
+import {NonTerminal, isNonTerminal, Category} from "../../src";
+import {Rule, isUnitProduction} from "../../src";
 
 import {expect} from "chai";
 import {Chart} from "../../src/earley/chart/chart";

@@ -1,7 +1,7 @@
-import {isNonTerminal, WordWithTypes, Terminal} from "../grammar/category";
-import {Semiring} from "semiring";
-import {Chart} from "./chart/chart";
-import {getActiveCategory, State, advanceDot} from "./chart/state";
+import { isNonTerminal, WordWithTypes, Terminal } from "../grammar/category";
+import { Semiring } from "semiring";
+import { Chart } from "./chart/chart";
+import { getActiveCategory, State, advanceDot } from "./chart/state";
 
 
 /**
@@ -15,7 +15,7 @@ import {getActiveCategory, State, advanceDot} from "./chart/state";
  * @param stateSets
  */
 export function scan<S, T>(tokenPosition: number,
-    {word, types}: WordWithTypes<T>,
+                           {word, types}: WordWithTypes<T>,
                            sr: Semiring<S>,
                            stateSets: Chart<T, S>,
                            scanProbability?: (x: T, t: Terminal<T>[]) => S) {
@@ -106,8 +106,9 @@ function calculateInnerScore<S>(sr: Semiring<S>, previousInner: S, scanProbabili
  * @return Computed forward score for the new chart
  */
 function calculateForwardScore<S>(sr: Semiring<S>, previousStateForwardScore: S, scanProbability?: S): S {
-    if (!scanProbability)
+    if (!scanProbability) {
         return previousStateForwardScore;
-    else
+    } else {
         return sr.times(previousStateForwardScore, scanProbability);
+    }
 }

@@ -1,6 +1,6 @@
-import {Rule} from "../../grammar/rule";
-import {State} from "./state";
-import {StateToObjectMap} from "./state-to-object-map";
+import { Rule } from "../../grammar/rule";
+import { State } from "./state";
+import { StateToObjectMap } from "./state-to-object-map";
 
 export class StateIndex<SemiringType, TokenType> {
     private states: StateToObjectMap<TokenType, State<SemiringType, TokenType>>;

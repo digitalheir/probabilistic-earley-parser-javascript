@@ -1,13 +1,13 @@
-import {Grammar} from "../grammar/grammar";
-import {NonTerminal, Category, isNonTerminal, Terminal, WordWithTypes} from "../grammar/category";
-import {Rule} from "../grammar/rule";
-import {State} from "./chart/state";
-import {setViterbiScores, ViterbiScore} from "./chart/viterbi-score";
-import {Chart} from "./chart/chart";
-import {scan} from "./scan";
-import {predict} from "./predict";
-import {complete} from "./complete";
-import {ParseTree, addRightMost} from "./parsetree";
+import { Grammar } from "../grammar/grammar";
+import { NonTerminal, Category, isNonTerminal, Terminal, WordWithTypes } from "../grammar/category";
+import { Rule } from "../grammar/rule";
+import { State } from "./chart/state";
+import { setViterbiScores, ViterbiScore } from "./chart/viterbi-score";
+import { Chart } from "./chart/chart";
+import { scan } from "./scan";
+import { predict } from "./predict";
+import { complete } from "./complete";
+import { ParseTree, addRightMost } from "./parsetree";
 
 export function addState<S, T>(stateSets: Chart<T, S>,
                                index: number,
@@ -20,8 +20,9 @@ export function addState<S, T>(stateSets: Chart<T, S>,
     stateSets.setInnerScore(state, inner);
     stateSets.setForwardScore(state, forward);
 
-    if (stateSets.hasViterbiScore(state))
+    if (stateSets.hasViterbiScore(state)) {
         throw new Error("Viterbi score was already set for new chart?!");
+    }
     // stateSets.setViterbiScore(
     //     {
     //         origin: null,
@@ -158,8 +159,8 @@ export function getViterbiParse<S, T>(Start: NonTerminal,
     const [chart, ignored, init] = parseSentenceIntoChart(Start, grammar, tokens, scanProbability);
 
     if (!chart.has(init.rule, tokens.length,
-            0,
-            init.rule.right.length)) throw new Error("Could not parse sentence.");
+        0,
+        init.rule.right.length)) throw new Error("Could not parse sentence.");
 
     const finalState = chart.getOrCreate(
         tokens.length,
@@ -167,7 +168,6 @@ export function getViterbiParse<S, T>(Start: NonTerminal,
         init.rule.right.length,
         init.rule
     );
-
 
     const parseTree: ParseTree<T> = getViterbiParseFromChart(finalState, chart);
     const toProbability = grammar.probabilityMapping.toProbability;

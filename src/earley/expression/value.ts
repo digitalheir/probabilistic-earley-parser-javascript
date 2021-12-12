@@ -1,4 +1,4 @@
-import {Expression} from "semiring/abstract-expression/expression";
+import { Expression } from "semiring";
 
 export class DeferredValue<T> implements Expression<T> {
     public expression: Expression<T>;

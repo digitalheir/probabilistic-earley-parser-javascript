@@ -4,7 +4,6 @@ import {State, getActiveCategory} from "./chart/state";
 import {Category, isNonTerminal, NonTerminal} from "../grammar/category";
 import {Rule} from "../grammar/rule";
 
-
 /**
  * Makes predictions in the specified chart at the given index.
 
@@ -92,7 +91,6 @@ export function predict<S, T>(index: number,
                         });
                 });
         });
-
         newStates.forEach(ss => stateSets.getOrCreate(ss.position, ss.ruleStartPosition, ss.ruleDotPosition, ss.rule));
     }
     return changes;

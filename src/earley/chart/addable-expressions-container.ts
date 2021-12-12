@@ -1,10 +1,10 @@
-import {Semiring} from "semiring";
-import {Expression} from "semiring/abstract-expression/expression";
-import {State} from "./state";
-import {Rule} from "../../grammar/rule";
-import {Atom} from "semiring/abstract-expression/atom";
-import {StateToObjectMap} from "./state-to-object-map";
-import {DeferredValue} from "../expression/value";
+import { AtomicValue, Semiring } from "semiring";
+import { Expression } from "semiring";
+import { State } from "./state";
+import { Rule } from "../../grammar/rule";
+
+import { StateToObjectMap } from "./state-to-object-map";
+import { DeferredValue } from "../expression/value";
 
 /**
  * Contains references to deferred computations. Only supports addition. Used in completion stage.
@@ -13,12 +13,12 @@ export class DeferredStateScoreComputations<SemiringType, TokenType> {
     readonly semiring: Semiring<Expression<SemiringType>>;
 
     private states: StateToObjectMap<TokenType, DeferredValue<SemiringType>>;
-    private ZERO: Expression<SemiringType>;
+    private readonly ZERO: Expression<SemiringType>;
 
     constructor(semiring: Semiring<Expression<SemiringType>>) {
         this.states = new StateToObjectMap<TokenType, DeferredValue<SemiringType>>();
         this.semiring = semiring;
-        this.ZERO = new Atom<SemiringType>(this.semiring.additiveIdentity.resolve());
+        this.ZERO = new AtomicValue<SemiringType>(this.semiring.additiveIdentity.resolve());
     }
 
 
@@ -27,7 +27,7 @@ export class DeferredStateScoreComputations<SemiringType, TokenType> {
     // }
 
     getOrCreateByState(state: State<SemiringType, TokenType>,
-                        defaultValue: Expression<SemiringType>): DeferredValue<SemiringType> {
+                       defaultValue: Expression<SemiringType>): DeferredValue<SemiringType> {
         if (this.states.hasByState(state)) {
             return this.states.getByState(state);
         } else {
@@ -38,10 +38,10 @@ export class DeferredStateScoreComputations<SemiringType, TokenType> {
     }
 
     getOrCreate(rule: Rule<TokenType>,
-                         index: number,
-                         ruleStart: number,
-                         dotPosition: number,
-                         defaultValue: Expression<SemiringType>): DeferredValue<SemiringType> {
+                index: number,
+                ruleStart: number,
+                dotPosition: number,
+                defaultValue: Expression<SemiringType>): DeferredValue<SemiringType> {
         if (this.states.has(rule, index, ruleStart, dotPosition)) {
             return this.states.get(rule, index, ruleStart, dotPosition);
         } else {

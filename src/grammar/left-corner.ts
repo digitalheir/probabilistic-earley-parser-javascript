@@ -1,6 +1,6 @@
-import {NonTerminal, Category, isNonTerminal} from "./category";
-import {Rule, isUnitProduction} from "./rule";
-import {getOrCreateMap, getOrCreateSet} from "../util";
+import { NonTerminal, Category, isNonTerminal } from "./category";
+import { Rule, isUnitProduction } from "./rule";
+import { getOrCreateMap, getOrCreateSet } from "../util";
 
 /**
  * Returns the inverse of matrix `M`.
@@ -16,7 +16,9 @@ import {getOrCreateMap, getOrCreateSet} from "../util";
  */
 function invert(M: number[][]) {
     // if the matrix isn't square
-    if (M.length !== M[0].length) throw new Error("Matrix must be square");
+    if (M.length !== M[0].length) {
+        throw new Error("Matrix must be square");
+    }
 
     // create the identity matrix (I), and a copy (C) of the original
 
@@ -32,8 +34,7 @@ function invert(M: number[][]) {
             // if we're on the diagonal, put a 1 (for identity)
             if (i == j) {
                 I[i][j] = 1;
-            }
-            else {
+            } else {
                 I[i][j] = 0;
             }
 
@@ -69,8 +70,9 @@ function invert(M: number[][]) {
             // get the new diagonal
             e = C[i][i];
             // if it's still 0, not invertable (error)
-            if (e == 0)
+            if (e == 0) {
                 throw new Error("Matrix was not invertable");
+            }
         }
 
         // Scale this row down by e (so we have a 1 on the diagonal)
@@ -116,7 +118,7 @@ export class LeftCorners<T> {
     /**
      * X -L> Y probability, undefined for 0.0
      */
-    private map: Map<Category<T>, Map<Category<T>, number>>;
+    private readonly map: Map<Category<T>, Map<Category<T>, number>>;
     /**
      * X -L> Y is greater than 0.0
      */
@@ -151,8 +153,9 @@ export class LeftCorners<T> {
      */
     public add(x: Category<T>, y: Category<T>, probability: number) {
         const newProbability = this.get(x, y) /* defaults to zero */ + probability;
-        if (!isFinite(newProbability))
+        if (!isFinite(newProbability)) {
             throw new Error("Invalid left-[*]-corner probability: " + newProbability + " for " + x + " -L> " + y + " ... ");
+        }
         this.set(x, y, newProbability);
     }
 
@@ -259,8 +262,9 @@ export function getLeftCorners<T>(rules: Set<Rule<T>>, ZERO = 0.0): LeftCorners<
 
     // Sum all probabilities for left corners
     rules.forEach((rule: Rule<T>) => {
-        if (rule.right.length > 0 && isNonTerminal(rule.right[0]))
+        if (rule.right.length > 0 && isNonTerminal(rule.right[0])) {
             leftCorners.add(rule.left, rule.right[0], rule.probability);
+        }
     });
     return leftCorners;
 }

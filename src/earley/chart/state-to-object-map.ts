@@ -1,6 +1,6 @@
-import {Rule} from "../../grammar/rule";
-import {getOrCreateMap} from "../../util";
-import {State} from "./state";
+import { Rule } from "../../grammar/rule";
+import { getOrCreateMap } from "../../util";
+import { State } from "./state";
 
 export class StateToObjectMap<T, O> {
     private map: Map<Rule<T>,
@@ -11,6 +11,7 @@ export class StateToObjectMap<T, O> {
         /*index*/Map<number,
         /*rule start*/Map<number,
         /*dot position*/Map<number, O>>>>();
+
     // private _size: number = 0;
 
     constructor() {

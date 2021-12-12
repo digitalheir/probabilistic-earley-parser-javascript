@@ -1,8 +1,9 @@
-import {Category} from "../grammar/category";
+import { Category } from "../grammar/category";
+
 /**
  * A parse tree that represents the derivation of a string based on the
  * rules in a {@link Grammar}. Parse trees recursively contain
- * {@link #getChildren() other parse trees}, so they can be iterated through to
+ * other parse trees, so they can be iterated through to
  * find the entire derivation of a category.
  * <p>
  * Parse trees are essentially partial views of a Chart from a
@@ -20,7 +21,7 @@ export interface ParseTree<T> {
  * Creates a new parse tree with the specified category, parent, and
  * child trees.
  *
- * @param category The category of the {@link #getCategory() category} of this parse
+ * @param category The category of the category of this parse
  *                 tree.
  * @param children The list of children of this parse tree, in their linear
  *                 order.
