@@ -4,6 +4,16 @@
 
 # Probabilistic Earley parser
 
+## ⚠️ Warning
+This code is currently broken. It has a subtle bug which produces invalid results, can make your code run exponentially & could use exponential memory. 
+
+**DO NOT USE THIS LIBRARY!!!**
+
+Pull requests are welcome, but seeing as this is GitHub, nobody will care & the project is thus effectively abandoned. Contact maartentrompper@freedom.nl if you really need a functioning Probabilistic Earley Parser enough so that you are willing to fund it.  
+
+---
+
+
 This is a library for parsing a sequence of tokens (like words) into tree structures, along with the probability that the particular sequence generates that tree structure. This is mainly useful for linguistic purposes, such as morphological parsing, speech recognition and generally information extraction. It also finds applications in computational biology. 
 
 For example:
